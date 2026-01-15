@@ -21,9 +21,21 @@
                         },
                         {
                             "category": "Presentations",
-                            "type": "ppt",
-                            "title": "Presentation Introduction to Electricity & Ohm's Law.zip",
-                            "link": "assets/01_Electricity_Electronics/Unit_03_Intro_to_Electricity_Ohms_Law/Presentations/Presentation_Introduction to Electricity & Ohm's Law.zip.pptx"
+                            "type": "pdf",
+                            "title": "Presentation Introduction to Electrical and Ohms Law",
+                            "link": "assets/01_Electricity_Electronics/Unit_03_Intro_to_Electricity_Ohms_Law/Presentations/Presentation_Introduction to Electrical and Ohms Law.pdf"
+                        },
+                        {
+                            "category": "Audio",
+                            "type": "audio",
+                            "title": "From Atoms to Amps  The Essential Deep Dive into Ohm s Law, Cir",
+                            "link": "assets/01_Electricity_Electronics/Unit_03_Intro_to_Electricity_Ohms_Law/Audio/From_Atoms_to_Amps__The_Essential_Deep_Dive_into_Ohm_s_Law,_Cir.m4a"
+                        },
+                        {
+                            "category": "Miscellaneous",
+                            "type": "pdf",
+                            "title": "Worksheet  Ohm's Law Calculations",
+                            "link": "assets/01_Electricity_Electronics/Unit_03_Intro_to_Electricity_Ohms_Law/Miscellaneous/Worksheet_ Ohm's Law Calculations.pdf"
                         }
                     ]
                 },
