@@ -14,13 +14,13 @@ if (currentTheme) document.documentElement.setAttribute('data-theme', currentThe
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./service-worker.js')
-            .then(reg => console.log('Service Worker Registered'))
+            .then(reg => console.log('SW Registered'))
             .catch(err => console.log('SW Fail:', err));
     });
 }
 
 // ==========================================
-// 2. AUTHENTICATION (New Email/Pass System)
+// 2. AUTHENTICATION
 // ==========================================
 function checkLogin() {
     const email = document.getElementById('email-input').value.toLowerCase().trim();
@@ -31,12 +31,11 @@ function checkLogin() {
         .then(res => res.json())
         .then(users => {
             const validUser = users.find(u => u.email.toLowerCase() === email && u.password === pass);
-            
             if (validUser) {
                 currentUser = validUser;
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('main-app').style.display = 'block';
-                document.getElementById('user-display').innerText = `Logged in as: ${validUser.name}`;
+                document.getElementById('user-display').innerText = validUser.name;
                 loadContent();
             } else {
                 errorMsg.style.display = 'block';
@@ -44,16 +43,15 @@ function checkLogin() {
             }
         })
         .catch(err => {
-            console.error("Auth Error:", err);
-            errorMsg.innerText = "⚠️ System Error: Cannot load users file.";
+            console.error(err);
+            errorMsg.innerText = "⚠️ Error loading users file.";
             errorMsg.style.display = 'block';
         });
 }
-
 function logout() { location.reload(); }
 
 // ==========================================
-// 3. CORE LOGIC
+// 3. CORE LOGIC (Load/Render)
 // ==========================================
 function loadContent() {
     fetch('content.json')
@@ -63,20 +61,13 @@ function loadContent() {
             courseData.news = data.news || [];
             initDashboard();
         })
-        .catch(err => console.error("Content Load Error:", err));
+        .catch(err => console.error("Content Error:", err));
 }
 
 function initDashboard() {
     renderNews();
     renderModules(courseData.modules);
 }
-
-// ... (KEEP THE EXISTING SEARCH, RENDER MODULES, UNIT VIEWER, TOGGLE FUNCTIONS AS BEFORE) ...
-// (I am omitting the middle rendering code here to save space - it is identical to the previous version.
-//  Just paste the renderNews, filterContent, renderModules, openModule, toggleUnit functions here)
-
-// --- PASTE PREVIOUS RENDERING FUNCTIONS HERE ---
-// ...
 
 function renderNews() {
     const container = document.getElementById('news-feed');
@@ -156,6 +147,10 @@ function showHome() {
     document.getElementById('news-section').style.display = 'block';
     filterContent();
 }
+
+// ==========================================
+// 4. RESOURCE RENDERING & MEDIA VIEWER
+// ==========================================
 function renderUnitContent(unit) {
     let html = "";
     let hasContent = false;
@@ -163,65 +158,105 @@ function renderUnitContent(unit) {
         const files = unit.resources.filter(r => r.category === cat);
         if (files.length > 0) {
             hasContent = true;
-            html += `<div class="category-header">${getCategoryIcon(cat)} ${cat}</div>`;
+            html += `<div class="category-header">${cat}</div>`;
             html += files.map(renderResource).join('');
         }
     });
     return hasContent ? html : `<p style="color:var(--text-light); font-style:italic;">No resources uploaded.</p>`;
 }
-function getCategoryIcon(cat) {
-    if (cat === "Audio") return "🎧"; if (cat === "Video") return "📺"; if (cat === "Quizzes") return "🧠"; if (cat === "Course Notes") return "📝"; return "📂";
-}
+
 function renderResource(res) {
-    const previewId = "preview-" + Math.random().toString(36).substr(2, 9);
+    let icon = "📄";
+    let btnColor = "var(--primary)";
+    let btnText = "View";
+
+    // Quiz Special Case
     if (res.type === 'quiz') {
         const scoreKey = `quiz_score_${res.link}`;
         const best = localStorage.getItem(scoreKey) || "-";
-        return `<div class="resource"><div class="res-row"><span class="res-icon">🧠</span><div style="flex-grow:1;"><strong>${res.title}</strong><div style="font-size:0.8rem;">High Score: ${best}%</div></div><button class="preview-btn" style="background:var(--accent);" onclick="startQuiz('${res.link}')">▶ Start Quiz</button></div></div>`;
+        return `
+        <div class="resource" onclick="startQuiz('${res.link}')">
+            <div class="res-row">
+                <span class="res-icon" style="color:#dcae1d; background:rgba(220,174,29,0.1);">🧠</span>
+                <div style="flex-grow:1;">
+                    <div style="font-weight:600; color:var(--text-dark);">${res.title}</div>
+                    <div style="font-size:0.8rem; color:var(--text-light);">High Score: ${best}%</div>
+                </div>
+                <button class="preview-btn" style="background:#dcae1d15; color:#dcae1d; border:1px solid #dcae1d;">Start Quiz</button>
+            </div>
+        </div>`;
     }
-    if (res.type === 'audio') return `<div class="resource"><div class="res-row"><span class="res-icon">🎧</span><div style="width:100%"><strong>${res.title}</strong><br><audio controls src="${res.link}" style="width:100%; margin-top:5px;"></audio></div></div></div>`;
-    if (res.type === 'video') return `<div class="resource"><div class="res-row"><span class="res-icon">📺</span><div style="width:100%"><strong>${res.title}</strong><br><video controls width="100%" style="border-radius:5px; margin-top:5px; background:#000;"><source src="${res.link}" type="video/mp4"></video></div></div></div>`;
-    if (res.type === 'pdf') return `<div class="resource"><div class="res-row"><span class="res-icon" style="color:#d93025;">📕</span><a href="${res.link}" target="_blank" class="res-link">${res.title}</a><button class="preview-btn" onclick="togglePreview('${res.link}', '${previewId}')">👁️ Preview</button></div><iframe id="${previewId}" class="pdf-frame" src=""></iframe></div>`;
-    return `<div class="resource"><div class="res-row"><span class="res-icon">📄</span><a href="${res.link}" target="_blank" class="res-link">${res.title}</a></div></div>`;
+
+    // Media Types
+    if (res.type === 'pdf') { icon = "📕"; btnColor = "#d93025"; btnText = "Open PDF"; }
+    else if (res.type === 'video') { icon = "📺"; btnColor = "#c4302b"; btnText = "Watch Video"; }
+    else if (res.type === 'audio') { icon = "🎧"; btnColor = "#a142f4"; btnText = "Listen"; }
+    else if (res.type === 'word') { icon = "📝"; btnColor = "#2b579a"; btnText = "Download"; }
+    else if (res.type === 'ppt') { icon = "📽️"; btnColor = "#d24726"; btnText = "Download"; }
+
+    // OnClick logic: If PDF/Video use openMedia(), else just open link
+    let clickAction = `window.open('${res.link}', '_blank')`;
+    if(res.type === 'pdf' || res.type === 'video' || res.type === 'audio') {
+        clickAction = `openMedia('${res.link}', '${res.type}', '${res.title.replace(/'/g, "\\'")}')`;
+    }
+
+    return `
+    <div class="resource" onclick="${clickAction}">
+        <div class="res-row">
+            <span class="res-icon" style="color:${btnColor}; font-size:1.6rem;">${icon}</span>
+            <div style="flex-grow:1;">
+                <div style="font-weight:600; color:var(--text-dark);">${res.title}</div>
+                <div style="font-size:0.75rem; color:var(--text-light); text-transform:uppercase; font-weight:600;">${res.type}</div>
+            </div>
+            <button class="preview-btn" style="background:${btnColor}10; color:${btnColor}; border:1px solid ${btnColor}40;">
+                ${btnText}
+            </button>
+        </div>
+    </div>`;
 }
-function togglePreview(url, frameId) {
-    const frame = document.getElementById(frameId);
-    if (frame.style.display === "block") { frame.style.display = "none"; frame.src = ""; } 
-    else { frame.style.display = "block"; frame.src = url; }
+
+// Media Modal Functions
+function openMedia(url, type, title) {
+    const modal = document.getElementById('media-modal');
+    const frame = document.getElementById('media-frame');
+    document.getElementById('media-title').innerText = title;
+    frame.src = url;
+    modal.style.display = 'block';
+}
+
+function closeMedia() {
+    const modal = document.getElementById('media-modal');
+    const frame = document.getElementById('media-frame');
+    modal.style.display = 'none';
+    frame.src = "";
 }
 
 // ==========================================
-// 4. REPORT GENERATOR (NEW)
+// 5. REPORTING (Email)
 // ==========================================
 function generateReport() {
-    // 1. Get Name (Use login name if available, else prompt)
-    let name = currentUser ? currentUser.name : prompt("Enter your name for the report:", "Student");
+    let name = currentUser ? currentUser.name : prompt("Enter your name:", "");
     if (!name) return;
-
+    
+    // Replace this with your email
+    const instructorEmail = "YOUR_EMAIL@msletb.ie"; 
+    
     const date = new Date().toLocaleDateString();
-    let report = `MSLETB PHASE 2 - PROGRESS REPORT\n`;
-    report += `--------------------------------\n`;
-    report += `Student: ${name}\n`;
-    report += `Date:    ${date}\n`;
-    report += `--------------------------------\n\n`;
-
-    // 2. Module Progress
-    report += `MODULE PROGRESS:\n`;
+    let body = `Student: ${name}%0D%0A`; 
+    body += `Date: ${date}%0D%0A--------------------------------%0D%0A`;
+    
+    body += `MODULE PROGRESS:%0D%0A`;
     courseData.modules.forEach(mod => {
         let completed = 0;
         let total = mod.units ? mod.units.length : 0;
         if (total > 0) {
-            mod.units.forEach(u => {
-                if (userProgress[mod.title + "_" + u.name]) completed++;
-            });
+            mod.units.forEach(u => { if(userProgress[mod.title + "_" + u.name]) completed++; });
             const percent = Math.round((completed / total) * 100);
-            const bar = "█".repeat(Math.floor(percent / 10)) + "░".repeat(10 - Math.floor(percent / 10));
-            report += `[${bar}] ${percent}% - ${mod.title}\n`;
+            body += `[${percent}%] - ${mod.title}%0D%0A`;
         }
     });
 
-    // 3. Quiz Scores
-    report += `\nQUIZ SCORES:\n`;
+    body += `%0D%0AQUIZ SCORES:%0D%0A`;
     let quizFound = false;
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
@@ -229,27 +264,17 @@ function generateReport() {
             quizFound = true;
             let quizName = key.split('/').pop().replace('.json', '').replace(/_/g, ' ');
             let score = localStorage.getItem(key);
-            report += `- ${quizName}: ${score}%\n`;
+            body += `- ${quizName}: ${score}%%0D%0A`;
         }
     }
-    if (!quizFound) report += "(No quizzes attempted yet)\n";
-
-    // 4. Download
-    report += `\n--------------------------------\nEnd of Report`;
-    const blob = new Blob([report], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${name.replace(/ /g, "_")}_Report.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    if (!quizFound) body += "(No quizzes attempted)%0D%0A";
+    
+    window.location.href = `mailto:${instructorEmail}?subject=Progress Report - ${name}&body=${body}`;
 }
 
 // ==========================================
-// 5. TOOLS & THEMES & QUIZ ENGINE
+// 6. TOOLS & QUIZ ENGINE (Unchanged Logic)
 // ==========================================
-// (Paste the existing Tools, Theme, Quiz engine functions here... they are unchanged)
 function toggleTheme() {
     const current = document.documentElement.getAttribute('data-theme');
     let target = current === 'dark' ? 'light' : 'dark';
@@ -259,6 +284,7 @@ function toggleTheme() {
 function openTools() { document.getElementById('tools-modal').style.display = 'block'; }
 function closeTools() { document.getElementById('tools-modal').style.display = 'none'; }
 window.onclick = function(e) { if(e.target == document.getElementById('tools-modal')) closeTools(); }
+
 function switchTab(name) {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -283,6 +309,8 @@ function calcScale() {
     const result = (((pv - min) / (max - min)) * 16) + 4;
     document.getElementById('scale-result').innerText = `Output: ${result.toFixed(2)} mA`;
 }
+
+// Quiz Engine
 let currentQuizData = null;
 let currentQuizUrl = "";
 function startQuiz(url) {
@@ -295,7 +323,7 @@ function startQuiz(url) {
         modal.className = 'modal';
         modal.style.display = 'block';
         modal.innerHTML = `
-            <div class="modal-content quiz-container">
+            <div class="modal-content quiz-container" style="max-width:600px;">
                 <div class="quiz-header"><h2>${data.title}</h2><span class="close-modal" onclick="closeQuiz()">×</span></div>
                 <div id="quiz-body">${currentQuizData.map((q, i) => renderQuestion(q, i)).join('')}</div>
                 <div style="text-align:center; margin-top:20px;">
@@ -333,6 +361,7 @@ function submitQuiz() {
     const key = `quiz_score_${currentQuizUrl}`;
     const old = localStorage.getItem(key) || 0;
     if (percent > old) localStorage.setItem(key, percent);
-    loadContent(); 
+    closeQuiz();
+    loadContent();
 }
 function closeQuiz() { document.getElementById('quiz-modal').remove(); }
