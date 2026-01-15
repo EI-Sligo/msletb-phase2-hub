@@ -20,6 +20,41 @@
                             "link": "assets/01_Electricity_Electronics/Unit_03_Intro_to_Electricity_Ohms_Law/Presentations/Presentation_Introduction to Electricity & Ohm's Law.zip.pptx"
                         }
                     ]
+                },
+                {
+                    "name": "Unit 11 Semiconductors Diodes",
+                    "resources": [
+                        {
+                            "category": "Course Notes",
+                            "type": "word",
+                            "title": "Semiconductor and Diode Training Module",
+                            "link": "assets/01_Electricity_Electronics/Unit_11_Semiconductors_Diodes/Course Notes/Semiconductor and Diode Training Module.docx"
+                        },
+                        {
+                            "category": "Presentations",
+                            "type": "pdf",
+                            "title": "Diodes Theory and Application",
+                            "link": "assets/01_Electricity_Electronics/Unit_11_Semiconductors_Diodes/Presentations/Diodes_Theory_and_Application.pdf"
+                        },
+                        {
+                            "category": "Audio",
+                            "type": "audio",
+                            "title": "Diode Basics From Silicon to Rectifiers",
+                            "link": "assets/01_Electricity_Electronics/Unit_11_Semiconductors_Diodes/Audio/Diode_Basics_From_Silicon_to_Rectifiers.m4a"
+                        },
+                        {
+                            "category": "Video",
+                            "type": "video",
+                            "title": "The Electronic Gate",
+                            "link": "assets/01_Electricity_Electronics/Unit_11_Semiconductors_Diodes/Video/The_Electronic_Gate.mp4"
+                        },
+                        {
+                            "category": "Miscellaneous",
+                            "type": "image",
+                            "title": "Infographic",
+                            "link": "assets/01_Electricity_Electronics/Unit_11_Semiconductors_Diodes/Miscellaneous/Infographic.png"
+                        }
+                    ]
                 }
             ]
         }
