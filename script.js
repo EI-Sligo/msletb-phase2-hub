@@ -1,22 +1,21 @@
 // ==========================================
 // 1. CONFIGURATION
 // ==========================================
-const ALLOWED_CODES = ["phase2", "admin2025"]; // Add your codes here
+const ALLOWED_CODES = ["phase2", "admin2025"];
 const CATEGORY_ORDER = ["Course Notes", "Presentations", "Audio", "Video", "Miscellaneous"];
 
 // ==========================================
-// 2. NEWS
+// 2. APP STATE
 // ==========================================
-const NEWS_BOARD = [
-    { date: "System Update", text: "New 'Accordion' layout active. Click a Unit title to view its contents." },
-    { date: "Module 1", text: "Please ensure you have reviewed the Health & Safety docs before Tuesday." }
-];
+let courseData = { 
+    news: [], // Empty by default, filled by JSON
+    modules: [] 
+};
+let userProgress = JSON.parse(localStorage.getItem('msletb_progress')) || {};
 
 // ==========================================
-// 3. APP LOGIC
+// 3. LOGIC
 // ==========================================
-let courseData = { news: NEWS_BOARD, modules: [] };
-
 function checkPasscode() {
     const input = document.getElementById('passcode-input').value;
     if (ALLOWED_CODES.includes(input)) {
@@ -37,6 +36,7 @@ function loadContent() {
         .then(res => res.json())
         .then(data => {
             courseData.modules = data.modules;
+            courseData.news = data.news || []; // Load news from files
             initDashboard();
         })
         .catch(err => {
@@ -47,69 +47,119 @@ function loadContent() {
 
 function initDashboard() {
     renderNews();
-    const grid = document.getElementById('module-grid');
-    if (courseData.modules.length === 0) { grid.innerHTML = "<p>No modules found.</p>"; return; }
+    renderModules(courseData.modules);
+}
+
+function renderNews() {
+    const container = document.getElementById('news-feed');
     
-    grid.innerHTML = courseData.modules.map((mod, index) => `
-        <div class="module-card" onclick="openModule(${index})">
-            <h3>${mod.title}</h3>
-            <p>${mod.units ? mod.units.length : 0} Units</p>
+    if (courseData.news.length === 0) {
+        container.innerHTML = `<div class="news-item"><span class="news-date">System</span><br>No announcements at the moment.</div>`;
+        return;
+    }
+
+    container.innerHTML = courseData.news.map(item => `
+        <div class="news-item">
+            <span class="news-date">${item.date}</span><br>${item.text}
         </div>
     `).join('');
 }
 
-function renderNews() {
-    document.getElementById('news-feed').innerHTML = courseData.news.map(item => `
-        <div class="news-item"><span class="news-date">${item.date}</span><br>${item.text}</div>
-    `).join('');
+// --- SEARCH & FILTER ---
+function filterContent() {
+    const query = document.getElementById('search-input').value.toLowerCase();
+    if (!query) { renderModules(courseData.modules); return; }
+
+    const filtered = courseData.modules.filter(mod => {
+        const titleMatch = mod.title.toLowerCase().includes(query);
+        const unitMatch = mod.units.some(u => u.name.toLowerCase().includes(query));
+        return titleMatch || unitMatch;
+    });
+    renderModules(filtered);
 }
 
-// --- NEW: Open Module with Collapsible Units ---
+// --- RENDER MODULES ---
+function renderModules(modulesToRender) {
+    const grid = document.getElementById('module-grid');
+    if (modulesToRender.length === 0) { grid.innerHTML = "<p style='text-align:center; color:#666;'>No modules found.</p>"; return; }
+    
+    grid.innerHTML = modulesToRender.map((mod) => {
+        const originalIndex = courseData.modules.indexOf(mod);
+        
+        // Progress Logic
+        const totalUnits = mod.units ? mod.units.length : 0;
+        let completed = 0;
+        if(mod.units) {
+             mod.units.forEach(u => {
+                 if(userProgress[mod.title + "_" + u.name]) completed++;
+             });
+        }
+        const percent = totalUnits === 0 ? 0 : Math.round((completed / totalUnits) * 100);
+
+        return `
+        <div class="module-card" onclick="openModule(${originalIndex})">
+            <div style="display:flex; justify-content:space-between; align-items:start;">
+                <h3>${mod.title}</h3>
+                ${percent > 0 ? `<span class="progress-text">${percent}%</span>` : ''}
+            </div>
+            <p style="color:#666; font-size:0.9rem;">${totalUnits} Units</p>
+            <div class="progress-track"><div class="progress-fill" style="width: ${percent}%"></div></div>
+        </div>
+    `}).join('');
+}
+
+// --- UNIT VIEWER ---
 function openModule(index) {
     const module = courseData.modules[index];
-    
-    // Switch Views
     document.getElementById('dashboard-view').style.display = 'none';
     document.getElementById('news-section').style.display = 'none';
     document.getElementById('unit-viewer').style.display = 'block';
-
-    // Set Titles
     document.getElementById('module-title-display').innerText = module.title;
-    document.getElementById('module-desc-display').innerText = "Select a Unit to expand content";
     
     const contentArea = document.getElementById('unit-content-area');
     if (!module.units || module.units.length === 0) { contentArea.innerHTML = "<p>No units found.</p>"; return; }
 
-    // Generate HTML for Units (Closed by default)
     contentArea.innerHTML = module.units.map((unit, uIndex) => {
-        // Unique ID for each unit so we can toggle it
         const unitId = `unit-${uIndex}`;
-        
+        const storageId = module.title + "_" + unit.name;
+        const isChecked = userProgress[storageId] ? "checked" : "";
+
         return `
         <div class="unit-block" id="${unitId}">
             <div class="unit-header" onclick="toggleUnit('${unitId}')">
-                <h3>${unit.name}</h3>
-                <span class="chevron">▼</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span class="chevron">▼</span>
+                    <h3>${unit.name}</h3>
+                </div>
+                <div class="check-container" onclick="event.stopPropagation()">
+                    <label class="check-label">
+                        <input type="checkbox" ${isChecked} onchange="toggleProgress('${storageId}', this)"> Done
+                    </label>
+                </div>
             </div>
-            
-            <div class="unit-body">
-                ${renderUnitContent(unit)}
-            </div>
+            <div class="unit-body">${renderUnitContent(unit)}</div>
         </div>`;
     }).join('');
 }
 
-// --- NEW: Toggle Function ---
-function toggleUnit(id) {
-    const element = document.getElementById(id);
-    // This toggles the 'active' class defined in CSS
-    element.classList.toggle("active");
+function toggleUnit(id) { document.getElementById(id).classList.toggle("active"); }
+
+function toggleProgress(id, checkbox) {
+    if (checkbox.checked) userProgress[id] = true; else delete userProgress[id];
+    localStorage.setItem('msletb_progress', JSON.stringify(userProgress));
 }
 
+function showHome() {
+    document.getElementById('unit-viewer').style.display = 'none';
+    document.getElementById('dashboard-view').style.display = 'block';
+    document.getElementById('news-section').style.display = 'block';
+    filterContent();
+}
+
+// --- RESOURCES ---
 function renderUnitContent(unit) {
     let html = "";
     let hasContent = false;
-    
     CATEGORY_ORDER.forEach(cat => {
         const files = unit.resources.filter(r => r.category === cat);
         if (files.length > 0) {
@@ -118,15 +168,7 @@ function renderUnitContent(unit) {
             html += files.map(renderResource).join('');
         }
     });
-
-    if (!hasContent) return `<p style="color:#999; font-style:italic;">No resources uploaded yet.</p>`;
-    return html;
-}
-
-function showHome() {
-    document.getElementById('unit-viewer').style.display = 'none';
-    document.getElementById('dashboard-view').style.display = 'block';
-    document.getElementById('news-section').style.display = 'block';
+    return hasContent ? html : `<p style="color:#999; font-style:italic;">No resources uploaded.</p>`;
 }
 
 function getCategoryIcon(cat) {
@@ -139,27 +181,23 @@ function getCategoryIcon(cat) {
 
 function renderResource(res) {
     let icon = "📄";
-    if (res.type === 'pdf') icon = "📕";
-    if (res.type === 'word') icon = "📝";
-    if (res.type === 'excel') icon = "📊";
-    if (res.type === 'ppt') icon = "📽️";
-    if (res.type === 'audio') icon = "🎧";
-    if (res.type === 'video') icon = "📺";
-    if (res.type === 'image') icon = "🖼️";
-
-    let content = "";
+    const previewId = "preview-" + Math.random().toString(36).substr(2, 9);
+    
     if (res.type === 'audio') {
-        content = `<div><strong>${res.title}</strong></div><audio controls src="${res.link}" style="width:100%; margin-top:5px;"></audio>`;
-    } else if (res.type === 'video') {
-        content = `<div><strong>${res.title}</strong></div><video controls width="100%" style="border-radius:5px; margin-top:5px; background:#000;"><source src="${res.link}" type="video/mp4"></video>`;
-    } else if (res.type === 'image') {
-        content = `<div><strong>${res.title}</strong></div><img src="${res.link}" style="max-width:100%; border-radius:5px; margin-top:10px;">`;
-    } else {
-        content = `<a href="${res.link}" target="_blank" class="res-link">${res.title}</a>`;
+        return `<div class="resource"><div class="res-row"><span class="res-icon">🎧</span><div style="width:100%"><strong>${res.title}</strong><br><audio controls src="${res.link}" style="width:100%; margin-top:5px;"></audio></div></div></div>`;
+    } 
+    else if (res.type === 'video') {
+        return `<div class="resource"><div class="res-row"><span class="res-icon">📺</span><div style="width:100%"><strong>${res.title}</strong><br><video controls width="100%" style="border-radius:5px; margin-top:5px; background:#000;"><source src="${res.link}" type="video/mp4"></video></div></div></div>`;
     }
+    else if (res.type === 'pdf') {
+        return `<div class="resource"><div class="res-row"><span class="res-icon" style="color:#d93025;">📕</span><a href="${res.link}" target="_blank" class="res-link">${res.title}</a><button class="preview-btn" onclick="togglePreview('${res.link}', '${previewId}')">👁️ Preview</button></div><iframe id="${previewId}" class="pdf-frame" src=""></iframe></div>`;
+    }
+    
+    return `<div class="resource"><div class="res-row"><span class="res-icon">📄</span><a href="${res.link}" target="_blank" class="res-link">${res.title}</a></div></div>`;
+}
 
-    return `<div class="resource">
-            <span class="res-icon" style="color:#555;">${icon}</span>
-            <div style="width:100%;">${content}</div>
-            </div>`;
+function togglePreview(url, frameId) {
+    const frame = document.getElementById(frameId);
+    if (frame.style.display === "block") { frame.style.display = "none"; frame.src = ""; } 
+    else { frame.style.display = "block"; frame.src = url; }
 }
