@@ -1,0 +1,505 @@
+{
+  "title": "Unit 11: Semiconductors & Diodes Master Quiz",
+  "questions": [
+    {
+      "question": "What is the smallest unit of matter that retains the properties of a chemical element?",
+      "options": ["Molecule", "Atom", "Electron", "Proton"],
+      "answer": 1
+    },
+    {
+      "question": "Which particle in an atom carries a positive electrical charge?",
+      "options": ["Neutron", "Electron", "Proton", "Ion"],
+      "answer": 2
+    },
+    {
+      "question": "Which particle in an atom carries a negative electrical charge?",
+      "options": ["Proton", "Neutron", "Electron", "Nucleus"],
+      "answer": 2
+    },
+    {
+      "question": "Which particle in an atom has no electrical charge (neutral)?",
+      "options": ["Electron", "Proton", "Neutron", "Ion"],
+      "answer": 2
+    },
+    {
+      "question": "What is an atom called when it has gained or lost an electron and becomes unbalanced?",
+      "options": ["Isotope", "Ion", "Molecule", "Neutrino"],
+      "answer": 1
+    },
+    {
+      "question": "What is the outermost shell of an atom called?",
+      "options": ["Core Shell", "Valence Shell", "Conduction Band", "Nucleus"],
+      "answer": 1
+    },
+    {
+      "question": "According to the Octet Rule, how many valence electrons does an atom seek to have to be stable?",
+      "options": ["2", "4", "6", "8"],
+      "answer": 3
+    },
+    {
+      "question": "How many valence electrons do Conductors typically have?",
+      "options": ["1, 2, or 3", "Exactly 4", "5, 6, or 7", "8"],
+      "answer": 0
+    },
+    {
+      "question": "How many valence electrons do Insulators typically have?",
+      "options": ["Less than 3", "Exactly 4", "5 to 8", "Zero"],
+      "answer": 2
+    },
+    {
+      "question": "How many valence electrons does a Semiconductor have?",
+      "options": ["1", "4", "8", "14"],
+      "answer": 1
+    },
+    {
+      "question": "Which of the following is a common conductor material?",
+      "options": ["Silicon", "Rubber", "Copper", "Mica"],
+      "answer": 2
+    },
+    {
+      "question": "Which of the following is a common semiconductor material?",
+      "options": ["Gold", "Silicon", "Glass", "Plastic"],
+      "answer": 1
+    },
+    {
+      "question": "What type of bonding occurs in a pure silicon crystal?",
+      "options": ["Ionic Bonding", "Covalent Bonding", "Metallic Bonding", "Magnetic Bonding"],
+      "answer": 1
+    },
+    {
+      "question": "At absolute zero temperature, how does pure silicon behave?",
+      "options": ["As a perfect conductor", "As a perfect insulator", "As a resistor", "As a capacitor"],
+      "answer": 1
+    },
+    {
+      "question": "What is the process of adding impurities to pure silicon to increase conductivity called?",
+      "options": ["Bonding", "Rectification", "Doping", "Ionization"],
+      "answer": 2
+    },
+    {
+      "question": "To create N-Type material, what type of impurity element is added?",
+      "options": ["Trivalent", "Pentavalent", "Monovalent", "Inert"],
+      "answer": 1
+    },
+    {
+      "question": "How many valence electrons does a Pentavalent atom have?",
+      "options": ["3", "4", "5", "8"],
+      "answer": 2
+    },
+    {
+      "question": "What are the majority charge carriers in N-Type material?",
+      "options": ["Holes", "Electrons", "Protons", "Neutrons"],
+      "answer": 1
+    },
+    {
+      "question": "To create P-Type material, what type of impurity element is added?",
+      "options": ["Pentavalent", "Trivalent", "Hexavalent", "Divalent"],
+      "answer": 1
+    },
+    {
+      "question": "How many valence electrons does a Trivalent atom have?",
+      "options": ["3", "4", "5", "6"],
+      "answer": 0
+    },
+    {
+      "question": "What is the 'vacancy' left by a missing electron in P-Type material called?",
+      "options": ["A Gap", "A Hole", "A Void", "A Proton"],
+      "answer": 1
+    },
+    {
+      "question": "What are the majority charge carriers in P-Type material?",
+      "options": ["Electrons", "Neutrons", "Holes", "Ions"],
+      "answer": 2
+    },
+    {
+      "question": "Which of these is a common Pentavalent impurity?",
+      "options": ["Boron", "Gallium", "Arsenic", "Indium"],
+      "answer": 2
+    },
+    {
+      "question": "Which of these is a common Trivalent impurity?",
+      "options": ["Phosphorus", "Antimony", "Arsenic", "Boron"],
+      "answer": 3
+    },
+    {
+      "question": "What is the boundary between P-Type and N-Type material called?",
+      "options": ["The Wall", "The PN Junction", "The Valence Gap", "The Anode"],
+      "answer": 1
+    },
+    {
+      "question": "When N and P materials join, electrons cross the junction to fill holes. What is this region called?",
+      "options": ["Active Region", "Depletion Region", "Conduction Region", "Saturation Region"],
+      "answer": 1
+    },
+    {
+      "question": "What acts as the 'wall' preventing further electron flow in the depletion region?",
+      "options": ["Barrier Potential", "Resistance", "Capacitance", "Inductance"],
+      "answer": 0
+    },
+    {
+      "question": "What is the approximate barrier potential (Knee Voltage) for a Silicon diode?",
+      "options": ["0.3 V", "0.6 V", "1.2 V", "5.0 V"],
+      "answer": 1
+    },
+    {
+      "question": "What is the approximate barrier potential for a Germanium diode?",
+      "options": ["0.3 V", "0.7 V", "1.5 V", "0.1 V"],
+      "answer": 0
+    },
+    {
+      "question": "The P-side of a diode is known as the:",
+      "options": ["Cathode", "Anode", "Base", "Emitter"],
+      "answer": 1
+    },
+    {
+      "question": "The N-side of a diode is known as the:",
+      "options": ["Anode", "Cathode", "Collector", "Gate"],
+      "answer": 1
+    },
+    {
+      "question": "To Forward Bias a diode, how must you connect the DC supply?",
+      "options": ["Positive to Cathode, Negative to Anode", "Positive to Anode, Negative to Cathode", "Positive to both terminals", "Negative to both terminals"],
+      "answer": 1
+    },
+    {
+      "question": "What happens to the depletion region during Forward Bias?",
+      "options": ["It widens", "It stays the same", "It narrows (decreases)", "It disappears instantly"],
+      "answer": 2
+    },
+    {
+      "question": "To Reverse Bias a diode, how do you connect the supply?",
+      "options": ["Positive to Anode", "Positive to Cathode, Negative to Anode", "Negative to Cathode", "AC to Anode"],
+      "answer": 1
+    },
+    {
+      "question": "What happens to the depletion region during Reverse Bias?",
+      "options": ["It widens (increases)", "It narrows", "It conducts current", "It overheats immediately"],
+      "answer": 0
+    },
+    {
+      "question": "A diode acts like a ______ switch when Forward Biased.",
+      "options": ["Open", "Closed", "Broken", "Resistive"],
+      "answer": 1
+    },
+    {
+      "question": "A diode acts like a ______ switch when Reverse Biased.",
+      "options": ["Closed", "Open", "High Current", "Digital"],
+      "answer": 1
+    },
+    {
+      "question": "In the V-I Characteristic Curve, what is the voltage where current shoots upwards called?",
+      "options": ["Breakdown Voltage", "Knee Voltage", "Peak Voltage", "Reverse Voltage"],
+      "answer": 1
+    },
+    {
+      "question": "What does PIV stand for?",
+      "options": ["Positive Input Voltage", "Peak Inverse Voltage", "Primary Internal Value", "Power In Volts"],
+      "answer": 1
+    },
+    {
+      "question": "What happens if you exceed the PIV of a standard diode?",
+      "options": ["It works better", "It blocks more current", "It will be destroyed", "It becomes a Zener"],
+      "answer": 2
+    },
+    {
+      "question": "On a physical diode package, what does the painted band indicate?",
+      "options": ["Anode", "Cathode", "Ground", "Voltage Rating"],
+      "answer": 1
+    },
+    {
+      "question": "In the diode symbol, what does the arrow represent?",
+      "options": ["Electron Flow", "Conventional Current Flow", "Voltage Drop", "Heat Dissipation"],
+      "answer": 1
+    },
+    {
+      "question": "In the diode symbol, what does the straight bar represent?",
+      "options": ["Anode", "Cathode", "Resistor", "Fuse"],
+      "answer": 1
+    },
+    {
+      "question": "When testing a good diode in Forward Bias with a multimeter, what should you read?",
+      "options": ["OL", "0.0 V", "Approx 0.5V to 0.7V", "12V"],
+      "answer": 2
+    },
+    {
+      "question": "When testing a good diode in Reverse Bias with a multimeter, what should you read?",
+      "options": ["0.6 V", "0.0 V", "OL (Open Loop)", "Beeping Sound"],
+      "answer": 2
+    },
+    {
+      "question": "If a diode reads 0V in both directions, what is the fault?",
+      "options": ["It is Open", "It is Shorted", "It is Leaking", "It is Good"],
+      "answer": 1
+    },
+    {
+      "question": "If a diode reads OL in both directions, what is the fault?",
+      "options": ["It is Shorted", "It is Open", "It is Forward Biased", "It is a Zener"],
+      "answer": 1
+    },
+    {
+      "question": "What is the process of converting AC to DC called?",
+      "options": ["Inversion", "Rectification", "Amplification", "Attenuation"],
+      "answer": 1
+    },
+    {
+      "question": "How many diodes are used in a Half-Wave rectifier?",
+      "options": ["1", "2", "3", "4"],
+      "answer": 0
+    },
+    {
+      "question": "In a Half-Wave rectifier, what happens during the negative half-cycle?",
+      "options": ["Current doubles", "Current flows backwards", "Current is blocked", "Voltage increases"],
+      "answer": 2
+    },
+    {
+      "question": "If the input frequency is 50Hz, what is the ripple frequency of a Half-Wave rectifier?",
+      "options": ["25 Hz", "50 Hz", "100 Hz", "0 Hz"],
+      "answer": 1
+    },
+    {
+      "question": "How many diodes are required for a Full-Wave Bridge Rectifier?",
+      "options": ["1", "2", "4", "6"],
+      "answer": 2
+    },
+    {
+      "question": "In a Bridge Rectifier, how many diodes conduct at any one time?",
+      "options": ["1", "2", "3", "4"],
+      "answer": 1
+    },
+    {
+      "question": "If the input frequency is 50Hz, what is the ripple frequency of a Full-Wave Bridge Rectifier?",
+      "options": ["50 Hz", "60 Hz", "100 Hz", "200 Hz"],
+      "answer": 2
+    },
+    {
+      "question": "What component is used to smooth the pulsating DC output?",
+      "options": ["Inductor", "Resistor", "Capacitor", "Transistor"],
+      "answer": 2
+    },
+    {
+      "question": "How is a smoothing capacitor connected?",
+      "options": ["In Series with the load", "In Parallel with the load", "Before the diode", "Instead of the load"],
+      "answer": 1
+    },
+    {
+      "question": "What is the small variation in voltage remaining after smoothing called?",
+      "options": ["Surge", "Ripple Voltage", "Peak Voltage", "RMS"],
+      "answer": 1
+    },
+    {
+      "question": "What is the primary application of a Zener Diode?",
+      "options": ["Rectification", "Amplification", "Voltage Regulation", "Light Emission"],
+      "answer": 2
+    },
+    {
+      "question": "In which region is a Zener Diode designed to operate?",
+      "options": ["Forward Bias", "Reverse Breakdown", "Saturation", "Cut-off"],
+      "answer": 1
+    },
+    {
+      "question": "If a 5.1V Zener is connected in parallel with a load, what is the maximum voltage the load will see?",
+      "options": ["0.6 V", "5.1 V", "12 V", "Infinite"],
+      "answer": 1
+    },
+    {
+      "question": "What distinguishes the Zener diode symbol?",
+      "options": ["Arrows pointing away", "Bent ends on the cathode bar (Z shape)", "A circle around it", "Three terminals"],
+      "answer": 1
+    },
+    {
+      "question": "What does LED stand for?",
+      "options": ["Light Energy Diode", "Light Emitting Diode", "Low Energy Device", "Long Emitting Diode"],
+      "answer": 1
+    },
+    {
+      "question": "What distinguishes the LED symbol?",
+      "options": ["A Z shape", "Two small arrows pointing away", "Two small arrows pointing in", "A capacitor symbol"],
+      "answer": 1
+    },
+    {
+      "question": "How do you identify the Anode of a physical LED?",
+      "options": ["Short leg", "Flat edge on body", "Long leg", "Painted band"],
+      "answer": 2
+    },
+    {
+      "question": "What happens if you connect an LED directly to a battery without a resistor?",
+      "options": ["It works perfectly", "It is dim", "It burns out immediately", "It charges the battery"],
+      "answer": 2
+    },
+    {
+      "question": "When converting electrical energy to light in an LED, what is the process called?",
+      "options": ["Photosynthesis", "Electroluminescence", "Incandescence", "Fluorescence"],
+      "answer": 1
+    },
+    {
+      "question": "When calculating current in a diode circuit, what must you do first?",
+      "options": ["Add 5V", "Subtract the Diode Drop (0.6V) from the Supply", "Ignore the diode", "Multiply voltage by 2"],
+      "answer": 1
+    },
+    {
+      "question": "Calculate Current: Supply=6.6V, Silicon Diode, Resistor=10 Ohms.",
+      "options": ["0.6 A", "0.66 A", "6 A", "0.5 A"],
+      "answer": 0
+    },
+    {
+      "question": "Calculate Current: Supply=10.6V, Silicon Diode, Resistor=100 Ohms.",
+      "options": ["0.1 A", "1.0 A", "0.01 A", "0.106 A"],
+      "answer": 0
+    },
+    {
+      "question": "Calculate LED Resistor: Supply=12V, LED Drop=2V, Desired Current=0.02A.",
+      "options": ["600 Ohms", "500 Ohms", "100 Ohms", "1000 Ohms"],
+      "answer": 1
+    },
+    {
+      "question": "Calculate LED Resistor: Supply=9V, LED Drop=2V, Desired Current=0.01A.",
+      "options": ["900 Ohms", "200 Ohms", "700 Ohms", "70 Ohms"],
+      "answer": 2
+    },
+    {
+      "question": "Why do diodes generate heat?",
+      "options": ["Because of friction", "Due to voltage drop across the junction (P = V x I)", "Because they are insulators", "They absorb light"],
+      "answer": 1
+    },
+    {
+      "question": "If a diode drops 0.6V and carries 10 Amps, how much power is dissipated as heat?",
+      "options": ["6 Watts", "10 Watts", "60 Watts", "0.6 Watts"],
+      "answer": 0
+    },
+    {
+      "question": "What is the condition where heat causes resistance to drop, causing more current and more heat, leading to failure?",
+      "options": ["Thermal Runaway", "Heat Stroke", "Zener Breakdown", "Thermal Equilibrium"],
+      "answer": 0
+    },
+    {
+      "question": "What device is used to dissipate heat from high-power components?",
+      "options": ["Fan", "Heat Sink", "Insulator", "Capacitor"],
+      "answer": 1
+    },
+    {
+      "question": "What material is a heat sink usually made of?",
+      "options": ["Plastic", "Glass", "Aluminium or Copper", "Wood"],
+      "answer": 2
+    },
+    {
+      "question": "What is used between a component and a heat sink to fill air gaps?",
+      "options": ["Glue", "Thermal Paste", "Water", "Tape"],
+      "answer": 1
+    },
+    {
+      "question": "Which semiconductor material is used for high-frequency applications but leaks more current?",
+      "options": ["Silicon", "Germanium", "Copper", "Plastic"],
+      "answer": 1
+    },
+    {
+      "question": "An atom with 8 valence electrons is considered:",
+      "options": ["Unstable", "Chemically Inert / Stable", "A good conductor", "A good semiconductor"],
+      "answer": 1
+    },
+    {
+      "question": "A positive ion has:",
+      "options": ["Gained an electron", "Lost an electron", "Gained a proton", "Lost a neutron"],
+      "answer": 1
+    },
+    {
+      "question": "A negative ion has:",
+      "options": ["Gained an electron", "Lost an electron", "Lost a proton", "Gained a neutron"],
+      "answer": 0
+    },
+    {
+      "question": "What provides the energy to knock electrons free in a conductor?",
+      "options": ["Gravity", "Voltage (EMF)", "Magnetism", "Air Pressure"],
+      "answer": 1
+    },
+    {
+      "question": "What is the main advantage of gold contacts?",
+      "options": ["Lowest resistance", "Cheapest cost", "Does not corrode", "Highest melting point"],
+      "answer": 2
+    },
+    {
+      "question": "In a diode symbol, the flat line corresponds to which physical feature?",
+      "options": ["The painted band", "The long leg", "The metal tab", "The black body"],
+      "answer": 0
+    },
+    {
+      "question": "What is the leakage current in a reverse-biased diode?",
+      "options": ["Massive current", "Microscopic current (often ignored)", "Equal to forward current", "Zero always"],
+      "answer": 1
+    },
+    {
+      "question": "Which of these is NOT a pentavalent impurity?",
+      "options": ["Arsenic", "Phosphorus", "Antimony", "Boron"],
+      "answer": 3
+    },
+    {
+      "question": "Which of these is NOT a trivalent impurity?",
+      "options": ["Boron", "Gallium", "Arsenic", "Indium"],
+      "answer": 2
+    },
+    {
+      "question": "If you measure a diode in circuit and it reads 0V, what must you check first?",
+      "options": ["Is the power ON", "Is the power OFF and capacitors discharged", "Is the meter broken", "Is the diode hot"],
+      "answer": 1
+    },
+    {
+      "question": "In a full-wave bridge, if one diode opens, what happens?",
+      "options": ["It becomes a half-wave rectifier", "It stops working completely", "It shorts out", "Output voltage doubles"],
+      "answer": 0
+    },
+    {
+      "question": "What happens to the barrier potential of a diode as temperature increases?",
+      "options": ["It increases", "It decreases slightly", "It stays exactly 0.7V", "It becomes 0V"],
+      "answer": 1
+    },
+    {
+      "question": "Why is Silicon preferred over Germanium?",
+      "options": ["Lower cost and higher temperature tolerance", "Lower barrier potential", "Better conduction", "More transparent"],
+      "answer": 0
+    },
+    {
+      "question": "What is the typical voltage drop of a standard red LED?",
+      "options": ["0.6 V", "0.7 V", "1.8 V to 2.2 V", "12 V"],
+      "answer": 2
+    },
+    {
+      "question": "Which type of current flows from Positive to Negative?",
+      "options": ["Electron Flow", "Conventional Flow", "Static Flow", "Ionic Flow"],
+      "answer": 1
+    },
+    {
+      "question": "Which type of current flows from Negative to Positive?",
+      "options": ["Electron Flow", "Conventional Flow", "Hole Flow", "Proton Flow"],
+      "answer": 0
+    },
+    {
+      "question": "The sharing of valence electrons between atoms is called:",
+      "options": ["Doping", "Covalent Bonding", "Rectification", "Biasing"],
+      "answer": 1
+    },
+    {
+      "question": "What determines the identity of an element (e.g. Gold vs Silver)?",
+      "options": ["Number of neutrons", "Number of electrons", "Number of protons (Atomic Number)", "Atomic weight"],
+      "answer": 2
+    },
+    {
+      "question": "Which region of the atom contains the most mass?",
+      "options": ["The Electron Cloud", "The Valence Shell", "The Nucleus", "The Conduction Band"],
+      "answer": 2
+    },
+    {
+      "question": "In N-Type material, the minority carriers are:",
+      "options": ["Electrons", "Holes", "Protons", "Neutrons"],
+      "answer": 1
+    },
+    {
+      "question": "In P-Type material, the minority carriers are:",
+      "options": ["Holes", "Electrons", "Ions", "Atoms"],
+      "answer": 1
+    },
+    {
+      "question": "What is the maximum forward current (If) rating?",
+      "options": ["Max current before melting/burning", "Max current before conduction", "Min current to turn on", "Current at 0V"],
+      "answer": 0
+    }
+  ]
+}

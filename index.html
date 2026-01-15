@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,6 +25,8 @@
                 <h1>Phase 2 Instrumentation</h1>
             </div>
             <nav>
+                <button onclick="toggleTheme()" class="nav-btn" title="Toggle Dark Mode">🌙</button>
+                <button onclick="openTools()" class="nav-btn">🧮 Tools</button>
                 <button onclick="showHome()" class="nav-btn">Dashboard</button>
                 <button onclick="logout()" class="nav-btn logout">Logout</button>
             </nav>
@@ -53,8 +55,7 @@
             <div id="unit-viewer" style="display: none;">
                 <button onclick="showHome()" class="back-btn">⬅ Back to Dashboard</button>
                 <h1 id="module-title-display"></h1>
-                <div id="module-progress-display" class="progress-bar-container">
-                    </div>
+                
                 <hr>
                 <div id="unit-content-area">
                     </div>
@@ -65,6 +66,40 @@
         <footer>
             <p>MSLETB Training Centre - Internal Use Only</p>
         </footer>
+    </div>
+
+    <div id="tools-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeTools()">&times;</span>
+            <h2>⚡ Instrumentation Tools</h2>
+            
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('ohms')">Ohm's Law</button>
+                <button class="tab-btn" onclick="switchTab('scaling')">4-20mA Scaling</button>
+            </div>
+
+            <div id="tab-ohms" class="tab-content active">
+                <p>Enter any two values to calculate the third:</p>
+                <div class="input-group">
+                    <input type="number" id="ohm-v" placeholder="Voltage (V)">
+                    <input type="number" id="ohm-i" placeholder="Current (A)">
+                    <input type="number" id="ohm-r" placeholder="Resistance (Ω)">
+                </div>
+                <button onclick="calcOhm()" class="calc-btn">Calculate</button>
+                <p id="ohm-result" class="result-text">Result: -</p>
+            </div>
+
+            <div id="tab-scaling" class="tab-content">
+                <p>Convert Process Variable (PV) to Current:</p>
+                <div class="input-group">
+                    <input type="number" id="scale-min" placeholder="Min Range (e.g. 0)">
+                    <input type="number" id="scale-max" placeholder="Max Range (e.g. 100)">
+                    <input type="number" id="scale-pv" placeholder="Current Value">
+                </div>
+                <button onclick="calcScale()" class="calc-btn">Calculate mA</button>
+                <p id="scale-result" class="result-text">Output: - mA</p>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
