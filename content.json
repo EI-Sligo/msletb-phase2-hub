@@ -55,6 +55,12 @@
                             "link": "assets/01_Electricity_Electronics/Unit_11_Semiconductors_Diodes/Video/The_Electronic_Gate.mp4"
                         },
                         {
+                            "category": "Quizzes",
+                            "type": "quiz",
+                            "title": "Unit 11 Quiz",
+                            "link": "assets/01_Electricity_Electronics/Unit_11_Semiconductors_Diodes/Quizzes/Unit_11_Quiz.json"
+                        },
+                        {
                             "category": "Miscellaneous",
                             "type": "image",
                             "title": "Infographic",
