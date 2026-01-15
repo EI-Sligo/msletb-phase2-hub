@@ -79,6 +79,41 @@
                             "link": "assets/01_Electricity_Electronics/Unit_11_Semiconductors_Diodes/Miscellaneous/Infographic.png"
                         }
                     ]
+                },
+                {
+                    "name": "Unit 12 Rectification Power Supplies",
+                    "resources": [
+                        {
+                            "category": "Course Notes",
+                            "type": "pdf",
+                            "title": "Rectification and Power Supply",
+                            "link": "assets/01_Electricity_Electronics/Unit_12_Rectification_Power_Supplies/Course Notes/Rectification and Power Supply.pdf"
+                        },
+                        {
+                            "category": "Presentations",
+                            "type": "pdf",
+                            "title": "AC to DC Power Fundamentals",
+                            "link": "assets/01_Electricity_Electronics/Unit_12_Rectification_Power_Supplies/Presentations/AC_to_DC_Power_Fundamentals.pdf"
+                        },
+                        {
+                            "category": "Audio",
+                            "type": "audio",
+                            "title": "Building a DC Power Supply From AC",
+                            "link": "assets/01_Electricity_Electronics/Unit_12_Rectification_Power_Supplies/Audio/Building_a_DC_Power_Supply_From_AC.m4a"
+                        },
+                        {
+                            "category": "Video",
+                            "type": "video",
+                            "title": "AC to DC  Journey of Power",
+                            "link": "assets/01_Electricity_Electronics/Unit_12_Rectification_Power_Supplies/Video/AC_to_DC__Journey_of_Power.mp4"
+                        },
+                        {
+                            "category": "Miscellaneous",
+                            "type": "image",
+                            "title": "Infographic",
+                            "link": "assets/01_Electricity_Electronics/Unit_12_Rectification_Power_Supplies/Miscellaneous/Infographic.png"
+                        }
+                    ]
                 }
             ]
         }
