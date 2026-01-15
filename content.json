@@ -1,0 +1,27 @@
+{
+    "modules": [
+        {
+            "title": "Electricity Electronics",
+            "folder": "01_Electricity_Electronics",
+            "units": [
+                {
+                    "name": "Unit 03 Intro to Electricity Ohms Law",
+                    "resources": [
+                        {
+                            "category": "Course Notes",
+                            "type": "pdf",
+                            "title": "Course Notes Introduction to Electricity and Ohms Law",
+                            "link": "assets/01_Electricity_Electronics/Unit_03_Intro_to_Electricity_Ohms_Law/Course Notes/Course Notes_Introduction to Electricity and Ohms Law.pdf"
+                        },
+                        {
+                            "category": "Presentations",
+                            "type": "ppt",
+                            "title": "Presentation Introduction to Electricity & Ohm's Law.zip",
+                            "link": "assets/01_Electricity_Electronics/Unit_03_Intro_to_Electricity_Ohms_Law/Presentations/Presentation_Introduction to Electricity & Ohm's Law.zip.pptx"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
