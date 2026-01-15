@@ -1,51 +1,234 @@
-/* General Setup */
-body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; margin: 0; color: #333; }
-button { cursor: pointer; }
+/* =========================================
+   1. GLOBAL RESET & TYPOGRAPHY
+   ========================================= */
+:root {
+    --primary: #003366;       /* MSLETB Navy */
+    --accent: #dcae1d;        /* Industrial Gold */
+    --bg-color: #f4f7f6;      /* Light Grey Background */
+    --card-bg: #ffffff;
+    --text-dark: #2c3e50;
+    --text-light: #6c757d;
+    --shadow: 0 4px 6px rgba(0,0,0,0.07);
+    --shadow-hover: 0 10px 15px rgba(0,0,0,0.1);
+}
 
-/* Login Screen */
-#login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #003366; display: flex; justify-content: center; align-items: center; z-index: 1000; }
-.login-box { background: white; padding: 40px; border-radius: 10px; text-align: center; width: 300px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-.login-box input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;}
-.login-box button { width: 100%; padding: 10px; background: #00cc99; color: white; border: none; border-radius: 5px; font-weight: bold; font-size: 16px; }
-.login-box button:hover { background: #00b386; }
-#error-msg { color: red; display: none; margin-top: 10px; font-weight: bold; }
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-color);
+    margin: 0;
+    color: var(--text-dark);
+    line-height: 1.6;
+}
 
-/* Header */
-header { background: #003366; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-header h1 { margin: 0; font-size: 1.4rem; }
-header button { background: transparent; border: 1px solid white; color: white; padding: 5px 15px; border-radius: 4px; margin-left: 10px; }
-header button:hover { background: white; color: #003366; }
+/* =========================================
+   2. LOGIN SCREEN (The Gatekeeper)
+   ========================================= */
+#login-screen {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: linear-gradient(135deg, var(--primary), #001f3f);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
 
-/* Main Container */
-.container { max-width: 1000px; margin: 30px auto; padding: 0 20px; min-height: 80vh; }
+.login-box {
+    background: white;
+    padding: 3rem;
+    border-radius: 12px;
+    text-align: center;
+    width: 100%;
+    max-width: 350px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
 
-/* News Section */
-#news-section { background: #fff; border-left: 6px solid #ffcc00; padding: 20px; border-radius: 5px; margin-bottom: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-.news-item { border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; }
-.news-item:last-child { border: none; margin: 0; }
-.news-date { font-weight: bold; color: #666; font-size: 0.9rem; }
+.login-box h2 { color: var(--primary); margin-bottom: 0.5rem; }
+.login-box p { color: var(--text-light); margin-bottom: 1.5rem; }
 
-/* Dashboard Grid */
-.grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
-.module-card { background: white; padding: 25px; border-radius: 8px; border-top: 5px solid #003366; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
-.module-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
-.module-card h3 { margin-top: 0; color: #003366; }
-.module-stats { display: block; margin-top: 15px; color: #888; font-size: 0.9rem; }
+.login-box input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 2px solid #eef2f5;
+    border-radius: 6px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: border 0.3s;
+}
 
-/* Unit Viewer */
-.back-btn { background: #ddd; border: none; padding: 8px 16px; border-radius: 4px; margin-bottom: 20px; }
-.back-btn:hover { background: #ccc; }
-.unit-block { background: white; margin-bottom: 20px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-.unit-header { background: #f8f9fa; padding: 15px 20px; border-bottom: 1px solid #eee; }
-.unit-header h3 { margin: 0; color: #444; }
-.unit-body { padding: 20px; }
+.login-box input:focus { border-color: var(--primary); outline: none; }
+
+.login-box button {
+    width: 100%;
+    padding: 12px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.login-box button:hover { background: #002244; }
+
+/* =========================================
+   3. HEADER & NAV
+   ========================================= */
+header {
+    background: white;
+    border-bottom: 4px solid var(--primary);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+header h1 { margin: 0; font-size: 1.5rem; color: var(--primary); font-weight: 700; }
+.logout-btn { background: none; border: 1px solid var(--text-light); color: var(--text-light); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; }
+.logout-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+/* =========================================
+   4. LAYOUT CONTAINERS
+   ========================================= */
+.container { max-width: 1100px; margin: 0 auto; padding: 2rem; min-height: 85vh; }
+
+/* News / Hero Section */
+#news-section {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2.5rem;
+    box-shadow: var(--shadow);
+    border-left: 6px solid var(--accent);
+}
+
+.news-item { margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #f0f0f0; }
+.news-item:last-child { border: none; margin: 0; padding: 0; }
+.news-date { font-size: 0.85rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* =========================================
+   5. MODULE DASHBOARD (Grid)
+   ========================================= */
+.section-title { font-size: 1.2rem; color: var(--text-light); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 1px; }
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.module-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 1px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.module-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--primary);
+}
+
+/* Decorative blue strip on top of cards */
+.module-card::before {
+    content: "";
+    position: absolute; top: 0; left: 0; width: 100%; height: 6px;
+    background: var(--primary);
+}
+
+.module-card h3 { margin-top: 0.5rem; color: var(--text-dark); font-size: 1.25rem; }
+.module-card p { color: var(--text-light); font-size: 0.9rem; margin-top: 0.5rem; }
+
+/* =========================================
+   6. UNIT VIEWER (Accordion Style)
+   ========================================= */
+.back-btn {
+    background: white;
+    border: 1px solid #ccc;
+    color: var(--text-dark);
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.back-btn:hover { background: #f0f0f0; }
+
+/* The Unit Container */
+.unit-block {
+    background: white;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    overflow: hidden;
+    border: 1px solid #eef2f5;
+}
+
+/* The Clickable Header */
+.unit-header {
+    background: white;
+    padding: 1.2rem 1.5rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s;
+}
+
+.unit-header:hover { background: #f8fbff; }
+.unit-header h3 { margin: 0; font-size: 1.1rem; color: var(--text-dark); font-weight: 600; }
+
+/* The Chevron Arrow */
+.chevron { font-size: 0.8rem; color: var(--text-light); transition: transform 0.3s ease; }
+.unit-block.active .chevron { transform: rotate(180deg); }
+.unit-block.active .unit-header { background: #f0f7ff; border-bottom: 1px solid #e0e0e0; }
+.unit-block.active .unit-header h3 { color: var(--primary); }
+
+/* The Hidden Content */
+.unit-body {
+    display: none; /* Hidden by default */
+    padding: 1.5rem;
+    background: #fff;
+    animation: fadeIn 0.3s ease-in-out;
+}
+.unit-block.active .unit-body { display: block; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
 /* Resources */
-.resource { display: flex; align-items: center; margin-bottom: 15px; padding: 10px; background: #f9f9f9; border-radius: 5px; }
-.resource:last-child { margin-bottom: 0; }
-.res-icon { font-size: 1.5rem; margin-right: 15px; }
-.res-link { text-decoration: none; color: #0066cc; font-weight: 500; font-size: 1.1rem; }
+.category-header { font-size: 0.85rem; text-transform: uppercase; color: var(--text-light); margin: 1.5rem 0 0.5rem 0; font-weight: 700; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+.category-header:first-child { margin-top: 0; }
+
+.resource {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    background: #fdfdfd;
+    border: 1px solid #f0f0f0;
+    transition: transform 0.2s;
+}
+.resource:hover { transform: translateX(5px); border-color: #e0e0e0; background: white; }
+.res-icon { font-size: 1.4rem; margin-right: 15px; width: 30px; text-align: center; }
+.res-link { text-decoration: none; color: var(--primary); font-weight: 500; width: 100%; }
 .res-link:hover { text-decoration: underline; }
-.audio-player { width: 100%; margin-top: 5px; }
-.video-wrapper { width: 100%; position: relative; padding-bottom: 56.25%; height: 0; margin-top: 10px; }
-.video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 5px; }
+
+/* Footer */
+footer { text-align: center; color: var(--text-light); font-size: 0.8rem; padding: 2rem; margin-top: 2rem; }

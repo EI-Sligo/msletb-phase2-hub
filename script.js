@@ -1,16 +1,15 @@
 // ==========================================
 // 1. CONFIGURATION
 // ==========================================
-const ALLOWED_CODES = ["phase2", "admin2025"];
-
-// Categories to display (in this order)
+const ALLOWED_CODES = ["phase2", "admin2025"]; // Add your codes here
 const CATEGORY_ORDER = ["Course Notes", "Presentations", "Audio", "Video", "Miscellaneous"];
 
 // ==========================================
 // 2. NEWS
 // ==========================================
 const NEWS_BOARD = [
-    { date: "Update", text: "New folder structure applied. Check Module 1." }
+    { date: "System Update", text: "New 'Accordion' layout active. Click a Unit title to view its contents." },
+    { date: "Module 1", text: "Please ensure you have reviewed the Health & Safety docs before Tuesday." }
 ];
 
 // ==========================================
@@ -42,7 +41,7 @@ function loadContent() {
         })
         .catch(err => {
             console.error(err);
-            document.getElementById('module-grid').innerHTML = "<p style='text-align:center'>⚠️ Content loading...</p>";
+            document.getElementById('module-grid').innerHTML = "<p style='text-align:center'>⚠️ Loading content...</p>";
         });
 }
 
@@ -50,6 +49,7 @@ function initDashboard() {
     renderNews();
     const grid = document.getElementById('module-grid');
     if (courseData.modules.length === 0) { grid.innerHTML = "<p>No modules found.</p>"; return; }
+    
     grid.innerHTML = courseData.modules.map((mod, index) => `
         <div class="module-card" onclick="openModule(${index})">
             <h3>${mod.title}</h3>
@@ -64,43 +64,63 @@ function renderNews() {
     `).join('');
 }
 
+// --- NEW: Open Module with Collapsible Units ---
 function openModule(index) {
     const module = courseData.modules[index];
+    
+    // Switch Views
     document.getElementById('dashboard-view').style.display = 'none';
     document.getElementById('news-section').style.display = 'none';
     document.getElementById('unit-viewer').style.display = 'block';
 
+    // Set Titles
     document.getElementById('module-title-display').innerText = module.title;
-    document.getElementById('module-desc-display').innerText = "Course Material";
+    document.getElementById('module-desc-display').innerText = "Select a Unit to expand content";
     
     const contentArea = document.getElementById('unit-content-area');
     if (!module.units || module.units.length === 0) { contentArea.innerHTML = "<p>No units found.</p>"; return; }
 
-    contentArea.innerHTML = module.units.map(unit => {
-        // Group resources by category
-        let unitHtml = `<div class="unit-block"><div class="unit-header"><h3>${unit.name}</h3></div><div class="unit-body">`;
+    // Generate HTML for Units (Closed by default)
+    contentArea.innerHTML = module.units.map((unit, uIndex) => {
+        // Unique ID for each unit so we can toggle it
+        const unitId = `unit-${uIndex}`;
         
-        let hasContent = false;
-        
-        // Loop through our defined categories
-        CATEGORY_ORDER.forEach(cat => {
-            // Find files in this category
-            const files = unit.resources.filter(r => r.category === cat);
+        return `
+        <div class="unit-block" id="${unitId}">
+            <div class="unit-header" onclick="toggleUnit('${unitId}')">
+                <h3>${unit.name}</h3>
+                <span class="chevron">▼</span>
+            </div>
             
-            if (files.length > 0) {
-                hasContent = true;
-                // Add a Sub-Header (e.g., "Audio")
-                unitHtml += `<h4 style="margin: 15px 0 10px 0; color:#555; border-bottom:1px solid #eee; padding-bottom:5px;">${getCategoryIcon(cat)} ${cat}</h4>`;
-                // Render files
-                unitHtml += files.map(renderResource).join('');
-            }
-        });
-
-        if (!hasContent) unitHtml += `<p style="color:#999; font-style:italic;">No resources uploaded.</p>`;
-        
-        unitHtml += `</div></div>`;
-        return unitHtml;
+            <div class="unit-body">
+                ${renderUnitContent(unit)}
+            </div>
+        </div>`;
     }).join('');
+}
+
+// --- NEW: Toggle Function ---
+function toggleUnit(id) {
+    const element = document.getElementById(id);
+    // This toggles the 'active' class defined in CSS
+    element.classList.toggle("active");
+}
+
+function renderUnitContent(unit) {
+    let html = "";
+    let hasContent = false;
+    
+    CATEGORY_ORDER.forEach(cat => {
+        const files = unit.resources.filter(r => r.category === cat);
+        if (files.length > 0) {
+            hasContent = true;
+            html += `<div class="category-header">${getCategoryIcon(cat)} ${cat}</div>`;
+            html += files.map(renderResource).join('');
+        }
+    });
+
+    if (!hasContent) return `<p style="color:#999; font-style:italic;">No resources uploaded yet.</p>`;
+    return html;
 }
 
 function showHome() {
@@ -135,9 +155,11 @@ function renderResource(res) {
     } else if (res.type === 'image') {
         content = `<div><strong>${res.title}</strong></div><img src="${res.link}" style="max-width:100%; border-radius:5px; margin-top:10px;">`;
     } else {
-        content = `<a href="${res.link}" target="_blank" style="text-decoration:none; color:#0066cc; font-weight:600;">${res.title}</a>`;
+        content = `<a href="${res.link}" target="_blank" class="res-link">${res.title}</a>`;
     }
 
-    return `<div class="resource" style="display:flex; align-items:flex-start; margin-bottom:10px; padding:10px; background:#fdfdfd; border:1px solid #f0f0f0; border-radius:5px;">
-            <span style="font-size:1.4rem; margin-right:10px;">${icon}</span><div style="width:100%;">${content}</div></div>`;
+    return `<div class="resource">
+            <span class="res-icon" style="color:#555;">${icon}</span>
+            <div style="width:100%;">${content}</div>
+            </div>`;
 }
