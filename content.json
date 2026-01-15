@@ -1,4 +1,10 @@
 {
+    "news": [
+        {
+            "date": "15Jan Welcome",
+            "text": "Welcome to the Class Starting 03 Feb 2026"
+        }
+    ],
     "modules": [
         {
             "title": "Electricity Electronics",
