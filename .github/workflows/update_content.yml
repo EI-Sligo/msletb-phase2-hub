@@ -1,0 +1,32 @@
+name: Auto-Update Course Content
+
+on:
+  push:
+    paths:
+      - 'assets/**' # Only run when files in assets change
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write # Give permission to save the JSON file
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Run Scanner Script
+      run: python scripts/scan_assets.py
+
+    - name: Commit and Push content.json
+      run: |
+        git config --global user.name 'Content Bot'
+        git config --global user.email 'bot@noreply.github.com'
+        git add content.json
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update course content" && git push)
