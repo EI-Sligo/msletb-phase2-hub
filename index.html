@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MSLETB Phase 2 Hub</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
 </head>
 <body>
 
@@ -12,9 +13,15 @@
         <div class="login-box">
             <h2>MSLETB Course Hub</h2>
             <p>Phase 2: Electrical Instrumentation</p>
-            <input type="password" id="passcode-input" placeholder="Enter Class Code">
-            <button onclick="checkPasscode()">Login</button>
-            <p id="error-msg">❌ Access Denied</p>
+            
+            <input type="email" id="email-input" placeholder="Email Address">
+            <input type="password" id="password-input" placeholder="Password">
+            
+            <button onclick="checkLogin()">Login</button>
+            <p id="error-msg">❌ Invalid Email or Password</p>
+            <p id="install-txt" style="display:none; color:#ccc; font-size:0.8rem; margin-top:10px;">
+                💡 Tip: Add to Home Screen to use Offline
+            </p>
         </div>
     </div>
 
@@ -23,63 +30,52 @@
         <header>
             <div class="logo-area">
                 <h1>Phase 2 Instrumentation</h1>
+                <span id="user-display" style="font-size:0.8rem; color:var(--text-light);"></span>
             </div>
             <nav>
                 <button onclick="toggleTheme()" class="nav-btn" title="Toggle Dark Mode">🌙</button>
                 <button onclick="openTools()" class="nav-btn">🧮 Tools</button>
+                <button onclick="generateReport()" class="nav-btn" style="border-color:var(--success); color:var(--success);">📋 Report</button>
                 <button onclick="showHome()" class="nav-btn">Dashboard</button>
                 <button onclick="logout()" class="nav-btn logout">Logout</button>
             </nav>
         </header>
 
         <div class="container">
-            
             <div id="news-section">
-                <div class="section-header">
-                    <h2>📢 Announcements</h2>
-                </div>
+                <div class="section-header"><h2>📢 Announcements</h2></div>
                 <div id="news-feed"></div>
             </div>
 
             <div id="dashboard-view">
-                
                 <div class="search-container">
-                    <input type="text" id="search-input" placeholder="🔍 Search topics (e.g. 'Ohm', 'Safety', 'Transformer')..." onkeyup="filterContent()">
+                    <input type="text" id="search-input" placeholder="🔍 Search topics..." onkeyup="filterContent()">
                 </div>
-
                 <h2 class="section-title">Course Modules</h2>
-                <div id="module-grid" class="grid-container">
-                    </div>
+                <div id="module-grid" class="grid-container"></div>
             </div>
 
             <div id="unit-viewer" style="display: none;">
                 <button onclick="showHome()" class="back-btn">⬅ Back to Dashboard</button>
                 <h1 id="module-title-display"></h1>
-                
                 <hr>
-                <div id="unit-content-area">
-                    </div>
+                <div id="unit-content-area"></div>
             </div>
-
         </div>
         
-        <footer>
-            <p>MSLETB Training Centre - Internal Use Only</p>
-        </footer>
+        <footer><p>MSLETB Training Centre - Internal Use Only</p></footer>
     </div>
 
     <div id="tools-modal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeTools()">&times;</span>
             <h2>⚡ Instrumentation Tools</h2>
-            
             <div class="tabs">
                 <button class="tab-btn active" onclick="switchTab('ohms')">Ohm's Law</button>
                 <button class="tab-btn" onclick="switchTab('scaling')">4-20mA Scaling</button>
             </div>
-
             <div id="tab-ohms" class="tab-content active">
-                <p>Enter any two values to calculate the third:</p>
+                <p>Calculate missing value:</p>
                 <div class="input-group">
                     <input type="number" id="ohm-v" placeholder="Voltage (V)">
                     <input type="number" id="ohm-i" placeholder="Current (A)">
@@ -88,12 +84,11 @@
                 <button onclick="calcOhm()" class="calc-btn">Calculate</button>
                 <p id="ohm-result" class="result-text">Result: -</p>
             </div>
-
             <div id="tab-scaling" class="tab-content">
-                <p>Convert Process Variable (PV) to Current:</p>
+                <p>Convert PV to mA:</p>
                 <div class="input-group">
-                    <input type="number" id="scale-min" placeholder="Min Range (e.g. 0)">
-                    <input type="number" id="scale-max" placeholder="Max Range (e.g. 100)">
+                    <input type="number" id="scale-min" placeholder="Min Range">
+                    <input type="number" id="scale-max" placeholder="Max Range">
                     <input type="number" id="scale-pv" placeholder="Current Value">
                 </div>
                 <button onclick="calcScale()" class="calc-btn">Calculate mA</button>

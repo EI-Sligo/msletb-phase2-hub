@@ -1,0 +1,20 @@
+[
+    {
+        "email": "admin@msletb.ie",
+        "password": "admin123",
+        "role": "admin",
+        "name": "Instructor"
+    },
+    {
+        "email": "student1@msletb.ie",
+        "password": "phase2",
+        "role": "student",
+        "name": "John Doe"
+    },
+    {
+        "email": "student2@msletb.ie",
+        "password": "phase2",
+        "role": "student",
+        "name": "Jane Smith"
+    }
+]
