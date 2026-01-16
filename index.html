@@ -18,10 +18,7 @@
             <input type="email" id="email-input" placeholder="Email Address">
             <input type="password" id="password-input" placeholder="Password">
             
-            <div style="display:flex; gap:10px; margin-top:10px;">
-                <button onclick="login()" style="flex:1;">Login</button>
-                <button onclick="signup()" style="flex:1; background:#6c757d;">Sign Up</button>
-            </div>
+            <button onclick="login()" style="width:100%; margin-top:10px;">Login</button>
             
             <p id="error-msg">❌ Error Message</p>
             
@@ -48,12 +45,14 @@
             <div id="dashboard-view">
                 
                 <div id="admin-panel" style="display:none; margin-bottom:30px; background:var(--card-bg); padding:20px; border-radius:12px; border:1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                        <h2 style="margin:0; font-size:1.2rem; color:var(--primary);">👨‍🏫 Instructor Dashboard</h2>
-                        <button onclick="loadAdminData()" style="background:none; border:none; color:var(--text-light); cursor:pointer;">🔄 Refresh List</button>
+                    
+                    <div style="display:flex; gap:10px; margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+                        <button onclick="switchAdminTab('list')" class="tab-btn active" id="btn-tab-list">👨‍🎓 Student List</button>
+                        <button onclick="switchAdminTab('add')" class="tab-btn" id="btn-tab-add">➕ Register New Student</button>
+                        <button onclick="loadAdminData()" style="margin-left:auto; background:none; border:none; color:var(--text-light); cursor:pointer;">🔄 Refresh</button>
                     </div>
 
-                    <div id="admin-students" style="display:block; max-height: 300px; overflow-y:auto;">
+                    <div id="admin-tab-list" style="display:block; max-height: 300px; overflow-y:auto;">
                         <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
                             <thead>
                                 <tr style="background:var(--bg); text-align:left; color:var(--text-light);">
@@ -67,6 +66,18 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <div id="admin-tab-add" style="display:none;">
+                        <h3 style="margin-top:0;">Create Student Account</h3>
+                        <p style="font-size:0.9rem; color:var(--text-light);">This will create a login for the student immediately.</p>
+                        
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; max-width:600px;">
+                            <input type="email" id="new-stu-email" placeholder="Student Email (e.g. john@msletb.ie)" class="modal-input">
+                            <input type="text" id="new-stu-pass" placeholder="Assign Password" class="modal-input">
+                        </div>
+                        <button onclick="adminCreateUser()" class="calc-btn" style="width:auto; padding:10px 30px;">Create User</button>
+                    </div>
+
                 </div>
 
                 <div class="search-container">
