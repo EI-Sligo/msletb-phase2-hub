@@ -27,19 +27,98 @@ let currentUser = null;
 let courseData = { modules: [] }; 
 let userProgress = {}; 
 
+// ==========================================
+// 2. CURRICULUM DATA
+// ==========================================
 const MODULE_MAP = {
-    "01_Electricity": "Electrical / Electronics",
-    "02_Installation": "Installation Techniques",
-    "03_Pressure": "Measurement - Pressure",
-    "04_Flow": "Measurement - Flow",
-    "05_Level": "Measurement - Level",
-    "06_Temp": "Measurement - Temperature",
-    "07_Control": "Automatic Control",
-    "00_EHS": "Health & Safety"
+    "00_EHS": "Module 0: Health and Safety",
+    "01_Electricity": "Module 1: Electricity/Electronics",
+    "02_Installation": "Module 2: Installation Techniques",
+    "03_Pressure": "Module 3: Measurement – Pressure",
+    "04_Flow": "Module 4: Measurement – Flow",
+    "05_Level": "Module 5: Measurement – Level",
+    "06_Temp": "Module 6: Measurement – Temperature",
+    "07_Control": "Module 7: Automatic Control"
+};
+
+const UNIT_DATA = {
+    "00_EHS": [
+        "Unit 1: Induction/Health and Safety",
+        "Unit 2: Manual Handling"
+    ],
+    "01_Electricity": [
+        "Unit 3: Introduction to Electricity/Ohm’s Law",
+        "Unit 4: Resistance Networks/Measurement",
+        "Unit 5: Power and Energy",
+        "Unit 6: Magnetism, Electromagnetism and Electromagnetic Induction",
+        "Unit 7: Capacitance in a DC Circuit",
+        "Unit 8: Introduction to AC",
+        "Unit 9: The Power Transformer",
+        "Unit 10: Soldering and Printed Circuit Board Techniques",
+        "Unit 11: Semiconductors and Diodes",
+        "Unit 12: Rectification and Power Supplies",
+        "Unit 13: Introduction to Logic",
+        "Unit 14: Introduction to Transistors"
+    ],
+    "02_Installation": [
+        "Unit 1: Basic Engineering",
+        "Unit 2: Conduit and Trunking Systems",
+        "Unit 3: Cables and Cable Termination",
+        "Unit 4: Lighting and Lighting Circuits",
+        "Unit 5: Consumer Unit and Protective Devices",
+        "Unit 6: Fixed Appliances and Socket Circuits",
+        "Unit 7: Earthing and Bonding",
+        "Unit 8: Multicore Cables",
+        "Unit 9: Installation Testing"
+    ],
+    "03_Pressure": [
+        "Unit 1: Pressure Measurement",
+        "Unit 2: Digital and Liquid Manometers",
+        "Unit 3: Elastic Pressure Elements",
+        "Unit 4: Calibration Standards",
+        "Unit 5: Pressure Switch",
+        "Unit 6: Pneumatic Transmitter",
+        "Unit 7: Electronic Transmitter",
+        "Unit 8: Test Equipment"
+    ],
+    "04_Flow": [
+        "Unit 1: Introduction to Flow",
+        "Unit 2: Orifice Plate Construction and Installation",
+        "Unit 3: DP Flow Measurement, Square Root Relationship Integration",
+        "Unit 4: Turbine Flowmeter/Positive Displacement Meters",
+        "Unit 5: Variable Area Meter",
+        "Unit 6: Vortex Flowmeter"
+    ],
+    "05_Level": [
+        "Unit 1: Level Measurement – Direct Method",
+        "Unit 2: Level Measurement – Head Method (Gas Purge System)",
+        "Unit 3: Head Type – Open Tank DP Method",
+        "Unit 4: Head Type – Closed Tank DP Method",
+        "Unit 5: Radar Level Systems",
+        "Unit 6: Level Switch-Level Electrode",
+        "Unit 7: Controller/Indicator/Recorders"
+    ],
+    "06_Temp": [
+        "Unit 1: Introduction to Temperature",
+        "Unit 2: Temperature Simulation/Measurement",
+        "Unit 3: Temperature Indicators/Switches/Recorders",
+        "Unit 4: Resistance Thermometer",
+        "Unit 5: Wheatstone Bridge",
+        "Unit 6: Thermocouples",
+        "Unit 7: Temperature Transmitter"
+    ],
+    "07_Control": [
+        "Unit 1: Instrument Loops, Functions, Drawings",
+        "Unit 2: Control Valve Assembly",
+        "Unit 3: I/P and P/I Converters",
+        "Unit 4: Electrically Operated Valves",
+        "Unit 5: Two-Step Control",
+        "Unit 6: Proportional Control"
+    ]
 };
 
 // ==========================================
-// 2. AUTHENTICATION & ADMIN FIX
+// 3. AUTHENTICATION & ADMIN
 // ==========================================
 window.login = async () => {
     const email = document.getElementById('email-input').value;
@@ -53,7 +132,6 @@ window.signup = async () => {
     const pass = document.getElementById('password-input').value;
     try {
         const userCred = await createUserWithEmailAndPassword(auth, email, pass);
-        // Create student doc by default
         await setDoc(doc(db, "users", userCred.user.uid), {
             email: email, role: 'student', progress: {}
         });
@@ -79,14 +157,12 @@ function showError(msg) {
     el.style.display = 'block';
 }
 
-// Auth Listener
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         currentUser = user;
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('main-app').style.display = 'block';
         
-        // Get User Role
         const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists()) {
             const userData = userDoc.data();
@@ -107,7 +183,7 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 // ==========================================
-// 3. ADMIN: USER MANAGEMENT & UPLOADS
+// 4. ADMIN: USER MANAGEMENT & UPLOADS
 // ==========================================
 window.loadAdminData = async () => {
     const snapshot = await getDocs(collection(db, "users"));
@@ -139,48 +215,77 @@ window.blockUser = async (uid) => {
 window.openUploadModal = () => document.getElementById('upload-modal').style.display = 'block';
 window.closeUploadModal = () => document.getElementById('upload-modal').style.display = 'none';
 
+window.updateUnitDropdown = () => {
+    const modSelect = document.getElementById('up-module');
+    const unitSelect = document.getElementById('up-unit');
+    const selectedMod = modSelect.value;
+    unitSelect.innerHTML = '<option value="">-- Select Unit --</option>';
+
+    if (selectedMod && UNIT_DATA[selectedMod]) {
+        unitSelect.disabled = false;
+        UNIT_DATA[selectedMod].forEach(unitName => {
+            const opt = document.createElement('option');
+            opt.value = unitName;
+            opt.innerText = unitName;
+            unitSelect.appendChild(opt);
+        });
+    } else {
+        unitSelect.disabled = true;
+        unitSelect.innerHTML = '<option value="">-- Select Module First --</option>';
+    }
+}
+
 window.uploadFile = async () => {
     const file = document.getElementById('up-file').files[0];
     const title = document.getElementById('up-title').value;
     const moduleId = document.getElementById('up-module').value;
-    const type = document.getElementById('up-type').value;
+    const unitName = document.getElementById('up-unit').value;
+    const category = document.getElementById('up-type').value;
     const status = document.getElementById('up-status');
 
-    if (!file || !title) { alert("Missing fields"); return; }
+    if (!file || !title || !moduleId || !unitName) { alert("Missing fields"); return; }
     status.innerText = "⏳ Uploading...";
 
     try {
-        const storageRef = ref(storage, `content/${file.name}`);
+        const storageRef = ref(storage, `content/${Date.now()}_${file.name}`);
         const snapshot = await uploadBytes(storageRef, file);
         const url = await getDownloadURL(snapshot.ref);
 
+        let fileType = 'pdf'; 
+        if(category === 'Video') fileType = 'video';
+        if(category === 'Audio') fileType = 'audio';
+        if(category === 'Quizzes') fileType = 'quiz';
+        if(category === 'Presentations') fileType = 'ppt';
+
         const docRef = doc(collection(db, "content"));
         await setDoc(docRef, {
-            id: docRef.id, title: title, moduleId: moduleId,
-            type: type, url: url, timestamp: new Date()
+            id: docRef.id, title: title, moduleId: moduleId, unit: unitName,
+            category: category, type: fileType, url: url, timestamp: new Date()
         });
 
         status.innerText = "✅ Success!";
-        setTimeout(() => { window.closeUploadModal(); loadContent(); status.innerText=""; }, 1000);
+        setTimeout(() => { window.closeUploadModal(); loadContent(); status.innerText=""; }, 1500);
     } catch (e) { status.innerText = "❌ Error: " + e.message; }
 }
 
 // ==========================================
-// 4. CONTENT & RENDERING
+// 5. CONTENT & RENDERING
 // ==========================================
 async function loadContent() {
     const querySnapshot = await getDocs(collection(db, "content"));
     let tempModules = {};
     
+    // Sort logic to ensure modules appear in correct order
+    const sortedKeys = Object.keys(MODULE_MAP).sort();
+    sortedKeys.forEach(k => {
+         tempModules[k] = { title: MODULE_MAP[k], id: k, resources: [] };
+    });
+
     querySnapshot.forEach((doc) => {
         const item = doc.data();
-        if (!tempModules[item.moduleId]) {
-            tempModules[item.moduleId] = {
-                title: MODULE_MAP[item.moduleId] || item.moduleId,
-                id: item.moduleId, resources: []
-            };
+        if (tempModules[item.moduleId]) {
+            tempModules[item.moduleId].resources.push(item);
         }
-        tempModules[item.moduleId].resources.push(item);
     });
     courseData.modules = Object.values(tempModules);
     renderModules();
@@ -188,8 +293,7 @@ async function loadContent() {
 
 function renderModules() {
     const grid = document.getElementById('module-grid');
-    if (courseData.modules.length === 0) { grid.innerHTML = "<p style='text-align:center; padding:20px;'>No content yet. Admin: Click 'Add Content'.</p>"; return; }
-    
+    // We don't hide grid if empty anymore, so empty modules still show up
     grid.innerHTML = courseData.modules.map((mod, index) => {
         let completed = 0;
         let total = mod.resources.length;
@@ -210,7 +314,41 @@ window.openModule = (index) => {
     document.getElementById('dashboard-view').style.display = 'none';
     document.getElementById('unit-viewer').style.display = 'block';
     document.getElementById('module-title-display').innerText = mod.title;
-    document.getElementById('unit-content-area').innerHTML = mod.resources.map(renderResource).join('');
+    
+    // Group resources by Unit
+    const contentArea = document.getElementById('unit-content-area');
+    const unitsInThisMod = UNIT_DATA[mod.id] || [];
+    
+    let html = "";
+    
+    unitsInThisMod.forEach(uName => {
+        // Find resources for this unit
+        const resources = mod.resources.filter(r => r.unit === uName);
+        
+        // Only show unit header if there are resources OR to show structure
+        html += `<div class="unit-block active">
+            <div class="unit-header" style="background:rgba(0,0,0,0.03); cursor:default;">
+                <h3>${uName}</h3>
+            </div>
+            <div class="unit-body" style="display:block;">`;
+            
+        if(resources.length === 0) {
+            html += `<p style="color:#ccc; font-style:italic; padding-left:10px;">No content uploaded yet.</p>`;
+        } else {
+            // Sort by Category
+            const cats = ["Course Notes", "Presentations", "Audio", "Video", "Quizzes", "Miscellaneous"];
+            cats.forEach(cat => {
+                const files = resources.filter(r => r.category === cat);
+                if(files.length > 0) {
+                    html += `<div class="category-header">${cat}</div>`;
+                    html += files.map(renderResource).join('');
+                }
+            });
+        }
+        html += `</div></div>`;
+    });
+    
+    contentArea.innerHTML = html;
 }
 
 window.showHome = () => {
@@ -223,10 +361,9 @@ function renderResource(res) {
     let icon = "📄"; let color = "var(--primary)"; let btn = "View";
     if (res.type === 'pdf') { icon = "📕"; color = "#d93025"; btn="Open PDF"; }
     if (res.type === 'video') { icon = "📺"; color = "#c4302b"; btn="Watch"; }
+    if (res.type === 'ppt') { icon = "📽️"; color = "#d24726"; btn="Download"; }
     
     const isChecked = userProgress[res.id] ? "checked" : "";
-    
-    // Onclick logic
     let action = `openMedia('${res.url}', '${res.title}')`;
     if(res.type === 'quiz') return renderQuizCard(res);
 
@@ -243,7 +380,6 @@ function renderResource(res) {
     </div>`;
 }
 
-// Progress Saving
 window.toggleProgress = async (rid, checkbox) => {
     if (!currentUser) return;
     if (checkbox.checked) userProgress[rid] = true; else delete userProgress[rid];
@@ -251,7 +387,7 @@ window.toggleProgress = async (rid, checkbox) => {
 }
 
 // ==========================================
-// 5. UTILS (Media, Tools, Theme)
+// 6. UTILS (Media, Tools)
 // ==========================================
 window.openMedia = (url, title) => {
     document.getElementById('media-modal').style.display = 'block';

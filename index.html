@@ -38,7 +38,6 @@
             </div>
             <nav>
                 <button id="upload-btn" onclick="openUploadModal()" class="nav-btn" style="display:none; border-color:var(--primary); color:var(--primary); font-weight:bold;">➕ Add Content</button>
-                
                 <button onclick="openTools()" class="nav-btn">🧮 Tools</button>
                 <button onclick="showHome()" class="nav-btn">Dashboard</button>
                 <button onclick="logout()" class="nav-btn logout">Logout</button>
@@ -92,24 +91,36 @@
         <div class="modal-content">
             <span class="close-modal" onclick="closeUploadModal()">&times;</span>
             <h2>Upload New Content</h2>
-            <input type="text" id="up-title" placeholder="Title (e.g. Ohm's Law Notes)" class="modal-input">
             
-            <select id="up-module" class="modal-input">
-                <option value="01_Electricity">Module 1: Electricity & Electronics</option>
+            <label style="font-weight:bold; font-size:0.9rem;">File Title:</label>
+            <input type="text" id="up-title" placeholder="e.g. Ohm's Law Slides" class="modal-input">
+            
+            <label style="font-weight:bold; font-size:0.9rem;">Select Module:</label>
+            <select id="up-module" class="modal-input" onchange="updateUnitDropdown()">
+                <option value="">-- Choose Module --</option>
+                <option value="00_EHS">Module 0: Health and Safety</option>
+                <option value="01_Electricity">Module 1: Electricity/Electronics</option>
                 <option value="02_Installation">Module 2: Installation Techniques</option>
-                <option value="03_Pressure">Module 3: Pressure Measurement</option>
-                <option value="04_Flow">Module 4: Flow Measurement</option>
-                <option value="05_Level">Module 5: Level Measurement</option>
-                <option value="06_Temp">Module 6: Temperature</option>
+                <option value="03_Pressure">Module 3: Measurement – Pressure</option>
+                <option value="04_Flow">Module 4: Measurement – Flow</option>
+                <option value="05_Level">Module 5: Measurement – Level</option>
+                <option value="06_Temp">Module 6: Measurement – Temperature</option>
                 <option value="07_Control">Module 7: Automatic Control</option>
-                <option value="00_EHS">Health & Safety (EHS)</option>
+            </select>
+
+            <label style="font-weight:bold; font-size:0.9rem;">Select Unit:</label>
+            <select id="up-unit" class="modal-input" disabled>
+                <option value="">-- Select Module First --</option>
             </select>
             
+            <label style="font-weight:bold; font-size:0.9rem;">Content Type:</label>
             <select id="up-type" class="modal-input">
-                <option value="pdf">PDF Document</option>
-                <option value="video">Video (MP4)</option>
-                <option value="audio">Audio (MP3)</option>
-                <option value="quiz">Quiz (JSON)</option>
+                <option value="Course Notes">Course Notes (PDF/Doc)</option>
+                <option value="Presentations">Presentation (PPT)</option>
+                <option value="Audio">Audio</option>
+                <option value="Video">Video</option>
+                <option value="Quizzes">Quiz (JSON)</option>
+                <option value="Miscellaneous">Miscellaneous</option>
             </select>
 
             <div style="border: 2px dashed #ccc; padding: 20px; text-align: center; margin-bottom: 20px; border-radius: 8px;">
