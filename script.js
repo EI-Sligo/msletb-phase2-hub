@@ -8,12 +8,12 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstati
 // 1. CONFIGURATION (PASTE YOUR KEYS HERE)
 // ==========================================
 const firebaseConfig = {
-    apiKey: "AIzaSy...",
-    authDomain: "msletb-phase2.firebaseapp.com",
-    projectId: "msletb-phase2",
-    storageBucket: "msletb-phase2.appspot.com",
-    messagingSenderId: "...",
-    appId: "..."
+  apiKey: "AIzaSyDX9DNXGIxUJjamCF49px-9ZFGJE2bi9iI",
+  authDomain: "msletb-phase2.firebaseapp.com",
+  projectId: "msletb-phase2",
+  storageBucket: "msletb-phase2.firebasestorage.app",
+  messagingSenderId: "603090820895",
+  appId: "1:603090820895:web:ed88ca0243b24ac9f65a2a"
 };
 
 // Initialize
