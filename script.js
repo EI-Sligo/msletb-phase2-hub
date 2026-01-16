@@ -1,367 +1,298 @@
+// Import Firebase Functions from the CDN
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
 // ==========================================
-// 1. CONFIGURATION & STATE
+// 1. PASTE YOUR CONFIG HERE
 // ==========================================
-const CATEGORY_ORDER = ["Course Notes", "Presentations", "Audio", "Video", "Quizzes", "Miscellaneous"];
-let courseData = { news: [], modules: [] };
-let userProgress = JSON.parse(localStorage.getItem('msletb_progress')) || {};
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDX9DNXGIxUJjamCF49px-9ZFGJE2bi9iI",
+  authDomain: "msletb-phase2.firebaseapp.com",
+  projectId: "msletb-phase2",
+  storageBucket: "msletb-phase2.firebasestorage.app",
+  messagingSenderId: "603090820895",
+  appId: "1:603090820895:web:ed88ca0243b24ac9f65a2a"
+};
+
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
+
+// ==========================================
+// 2. STATE & VARIABLES
+// ==========================================
 let currentUser = null;
+let courseData = { modules: [] }; 
+let userProgress = {}; // Live from Cloud
 
-// Load Theme
-const currentTheme = localStorage.getItem('msletb_theme');
-if (currentTheme) document.documentElement.setAttribute('data-theme', currentTheme);
-
-// Register PWA Service Worker
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js')
-            .then(reg => console.log('SW Registered'))
-            .catch(err => console.log('SW Fail:', err));
-    });
-}
-
-// ==========================================
-// 2. AUTHENTICATION
-// ==========================================
-function checkLogin() {
-    const email = document.getElementById('email-input').value.toLowerCase().trim();
-    const pass = document.getElementById('password-input').value.trim();
-    const errorMsg = document.getElementById('error-msg');
-
-    fetch('users.json')
-        .then(res => res.json())
-        .then(users => {
-            const validUser = users.find(u => u.email.toLowerCase() === email && u.password === pass);
-            if (validUser) {
-                currentUser = validUser;
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('main-app').style.display = 'block';
-                document.getElementById('user-display').innerText = validUser.name;
-                loadContent();
-            } else {
-                errorMsg.style.display = 'block';
-                setTimeout(() => errorMsg.style.display = 'none', 3000);
-            }
-        })
-        .catch(err => {
-            console.error(err);
-            errorMsg.innerText = "⚠️ Error loading users file.";
-            errorMsg.style.display = 'block';
-        });
-}
-function logout() { location.reload(); }
+// Map Modules for Organization
+const MODULE_MAP = {
+    "01_Electricity": "Electrical / Electronics",
+    "02_Installation": "Installation Techniques",
+    "03_Pressure": "Measurement - Pressure",
+    "04_Flow": "Measurement - Flow",
+    "05_Level": "Measurement - Level",
+    "06_Temp": "Measurement - Temperature",
+    "07_Control": "Automatic Control",
+    "00_EHS": "Health & Safety"
+};
 
 // ==========================================
-// 3. CORE LOGIC (Load/Render)
+// 3. AUTHENTICATION (Login)
 // ==========================================
-function loadContent() {
-    fetch('content.json')
-        .then(res => res.json())
-        .then(data => {
-            courseData.modules = data.modules;
-            courseData.news = data.news || [];
-            initDashboard();
-        })
-        .catch(err => console.error("Content Error:", err));
-}
-
-function initDashboard() {
-    renderNews();
-    renderModules(courseData.modules);
-}
-
-function renderNews() {
-    const container = document.getElementById('news-feed');
-    if (courseData.news.length === 0) {
-        container.innerHTML = `<div class="news-item">No announcements.</div>`;
-        return;
+window.login = async () => {
+    const email = document.getElementById('email-input').value;
+    const pass = document.getElementById('password-input').value;
+    
+    try {
+        await signInWithEmailAndPassword(auth, email, pass);
+        // Auth listener below handles the redirect
+    } catch (error) {
+        document.getElementById('error-msg').innerText = "❌ " + error.message;
+        document.getElementById('error-msg').style.display = 'block';
     }
-    container.innerHTML = courseData.news.map(item => `
-        <div class="news-item"><span class="news-date">${item.date}</span><br>${item.text}</div>
-    `).join('');
 }
 
-function filterContent() {
-    const query = document.getElementById('search-input').value.toLowerCase();
-    if (!query) { renderModules(courseData.modules); return; }
-    const filtered = courseData.modules.filter(mod => {
-        const titleMatch = mod.title.toLowerCase().includes(query);
-        const unitMatch = mod.units.some(u => u.name.toLowerCase().includes(query));
-        return titleMatch || unitMatch;
-    });
-    renderModules(filtered);
-}
+window.logout = () => signOut(auth);
 
-function renderModules(modulesToRender) {
-    const grid = document.getElementById('module-grid');
-    if (modulesToRender.length === 0) { grid.innerHTML = "<p style='text-align:center;'>No modules found.</p>"; return; }
-    grid.innerHTML = modulesToRender.map((mod) => {
-        const originalIndex = courseData.modules.indexOf(mod);
-        let completed = 0;
-        const totalUnits = mod.units ? mod.units.length : 0;
-        if(mod.units) {
-             mod.units.forEach(u => { if(userProgress[mod.title + "_" + u.name]) completed++; });
+// Listen for Login State Changes
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        currentUser = user;
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'block';
+        
+        // Load User Data (Role & Progress)
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            userProgress = userData.progress || {};
+            
+            // Check if Admin
+            if (userData.role === 'admin') {
+                document.getElementById('upload-btn').style.display = 'inline-block';
+                document.getElementById('admin-panel').style.display = 'block';
+                document.getElementById('user-role-display').style.display = 'inline-block';
+                loadAdminData(); // Load all students
+            }
+        } else {
+            // First time user, create doc
+            await setDoc(doc(db, "users", user.uid), { 
+                email: user.email, 
+                role: 'student', 
+                progress: {} 
+            });
         }
-        const percent = totalUnits === 0 ? 0 : Math.round((completed / totalUnits) * 100);
+        
+        loadContent(); // Load content from Cloud
+    } else {
+        document.getElementById('main-app').style.display = 'none';
+        document.getElementById('login-screen').style.display = 'flex';
+    }
+});
+
+// ==========================================
+// 4. CONTENT LOADING (From Firestore)
+// ==========================================
+async function loadContent() {
+    // In this "No-Code" version, we read "content" collection from Firestore
+    // If you haven't uploaded anything yet, it will be empty.
+    const querySnapshot = await getDocs(collection(db, "content"));
+    
+    let tempModules = {};
+    
+    querySnapshot.forEach((doc) => {
+        const item = doc.data();
+        // Group by Module ID
+        if (!tempModules[item.moduleId]) {
+            tempModules[item.moduleId] = {
+                title: MODULE_MAP[item.moduleId] || item.moduleId,
+                id: item.moduleId,
+                resources: []
+            };
+        }
+        tempModules[item.moduleId].resources.push(item);
+    });
+
+    // Convert map to array
+    courseData.modules = Object.values(tempModules);
+    renderModules();
+}
+
+// ==========================================
+// 5. RENDERING & UI (Same Visuals)
+// ==========================================
+function renderModules() {
+    const grid = document.getElementById('module-grid');
+    if (courseData.modules.length === 0) { 
+        grid.innerHTML = "<p style='text-align:center;'>No content uploaded yet. Click 'Add Content'.</p>"; 
+        return; 
+    }
+    
+    grid.innerHTML = courseData.modules.map((mod, index) => {
+        // Calculate Progress based on userProgress object
+        let completed = 0;
+        let total = mod.resources.length;
+        mod.resources.forEach(res => {
+            if (userProgress[res.id]) completed++;
+        });
+        const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+        
         return `
-        <div class="module-card" onclick="openModule(${originalIndex})">
-            <div style="display:flex; justify-content:space-between;"><h3>${mod.title}</h3>${percent > 0 ? `<span class="progress-text">${percent}%</span>` : ''}</div>
-            <p style="color:var(--text-light); font-size:0.9rem;">${totalUnits} Units</p>
+        <div class="module-card" onclick="openModule(${index})">
+            <div style="display:flex; justify-content:space-between;">
+                <h3>${mod.title}</h3>
+                ${percent > 0 ? `<span class="progress-text">${percent}%</span>` : ''}
+            </div>
+            <p>${total} Resources</p>
             <div class="progress-track"><div class="progress-fill" style="width: ${percent}%"></div></div>
         </div>`;
     }).join('');
 }
 
-function openModule(index) {
-    const module = courseData.modules[index];
+window.openModule = (index) => {
+    const mod = courseData.modules[index];
     document.getElementById('dashboard-view').style.display = 'none';
-    document.getElementById('news-section').style.display = 'none';
     document.getElementById('unit-viewer').style.display = 'block';
-    document.getElementById('module-title-display').innerText = module.title;
+    document.getElementById('module-title-display').innerText = mod.title;
+    
     const contentArea = document.getElementById('unit-content-area');
-    if (!module.units || module.units.length === 0) { contentArea.innerHTML = "<p>No units found.</p>"; return; }
-    contentArea.innerHTML = module.units.map((unit, uIndex) => {
-        const unitId = `unit-${uIndex}`;
-        const storageId = module.title + "_" + unit.name;
-        const isChecked = userProgress[storageId] ? "checked" : "";
-        return `
-        <div class="unit-block" id="${unitId}">
-            <div class="unit-header" onclick="toggleUnit('${unitId}')">
-                <div style="display:flex; align-items:center; gap:10px;"><span class="chevron">▼</span><h3>${unit.name}</h3></div>
-                <div class="check-container" onclick="event.stopPropagation()">
-                    <label class="check-label"><input type="checkbox" ${isChecked} onchange="toggleProgress('${storageId}', this)"> Done</label>
-                </div>
-            </div>
-            <div class="unit-body">${renderUnitContent(unit)}</div>
-        </div>`;
-    }).join('');
+    contentArea.innerHTML = mod.resources.map(res => renderResource(res)).join('');
 }
 
-function toggleUnit(id) { document.getElementById(id).classList.toggle("active"); }
-function toggleProgress(id, checkbox) {
-    if (checkbox.checked) userProgress[id] = true; else delete userProgress[id];
-    localStorage.setItem('msletb_progress', JSON.stringify(userProgress));
-}
-function showHome() {
+window.showHome = () => {
     document.getElementById('unit-viewer').style.display = 'none';
     document.getElementById('dashboard-view').style.display = 'block';
-    document.getElementById('news-section').style.display = 'block';
-    filterContent();
-}
-
-// ==========================================
-// 4. RESOURCE RENDERING & MEDIA VIEWER
-// ==========================================
-function renderUnitContent(unit) {
-    let html = "";
-    let hasContent = false;
-    CATEGORY_ORDER.forEach(cat => {
-        const files = unit.resources.filter(r => r.category === cat);
-        if (files.length > 0) {
-            hasContent = true;
-            html += `<div class="category-header">${cat}</div>`;
-            html += files.map(renderResource).join('');
-        }
-    });
-    return hasContent ? html : `<p style="color:var(--text-light); font-style:italic;">No resources uploaded.</p>`;
+    renderModules();
 }
 
 function renderResource(res) {
-    let icon = "📄";
-    let btnColor = "var(--primary)";
-    let btnText = "View";
-
-    // Quiz Special Case
-    if (res.type === 'quiz') {
-        const scoreKey = `quiz_score_${res.link}`;
-        const best = localStorage.getItem(scoreKey) || "-";
-        return `
-        <div class="resource" onclick="startQuiz('${res.link}')">
-            <div class="res-row">
-                <span class="res-icon" style="color:#dcae1d; background:rgba(220,174,29,0.1);">🧠</span>
-                <div style="flex-grow:1;">
-                    <div style="font-weight:600; color:var(--text-dark);">${res.title}</div>
-                    <div style="font-size:0.8rem; color:var(--text-light);">High Score: ${best}%</div>
-                </div>
-                <button class="preview-btn" style="background:#dcae1d15; color:#dcae1d; border:1px solid #dcae1d;">Start Quiz</button>
-            </div>
-        </div>`;
-    }
-
-    // Media Types
-    if (res.type === 'pdf') { icon = "📕"; btnColor = "#d93025"; btnText = "Open PDF"; }
-    else if (res.type === 'video') { icon = "📺"; btnColor = "#c4302b"; btnText = "Watch Video"; }
-    else if (res.type === 'audio') { icon = "🎧"; btnColor = "#a142f4"; btnText = "Listen"; }
-    else if (res.type === 'word') { icon = "📝"; btnColor = "#2b579a"; btnText = "Download"; }
-    else if (res.type === 'ppt') { icon = "📽️"; btnColor = "#d24726"; btnText = "Download"; }
-
-    // OnClick logic: If PDF/Video use openMedia(), else just open link
-    let clickAction = `window.open('${res.link}', '_blank')`;
-    if(res.type === 'pdf' || res.type === 'video' || res.type === 'audio') {
-        clickAction = `openMedia('${res.link}', '${res.type}', '${res.title.replace(/'/g, "\\'")}')`;
-    }
+    let icon = "📄"; let color = "var(--primary)"; let btnText = "View";
+    if (res.type === 'pdf') { icon = "📕"; color = "#d93025"; }
+    if (res.type === 'video') { icon = "📺"; color = "#c4302b"; }
+    
+    const isChecked = userProgress[res.id] ? "checked" : "";
 
     return `
-    <div class="resource" onclick="${clickAction}">
+    <div class="resource">
         <div class="res-row">
-            <span class="res-icon" style="color:${btnColor}; font-size:1.6rem;">${icon}</span>
+            <span class="res-icon" style="color:${color}; font-size:1.6rem;">${icon}</span>
             <div style="flex-grow:1;">
-                <div style="font-weight:600; color:var(--text-dark);">${res.title}</div>
-                <div style="font-size:0.75rem; color:var(--text-light); text-transform:uppercase; font-weight:600;">${res.type}</div>
+                <div style="font-weight:600;">${res.title}</div>
             </div>
-            <button class="preview-btn" style="background:${btnColor}10; color:${btnColor}; border:1px solid ${btnColor}40;">
-                ${btnText}
-            </button>
+            <label style="margin-right:15px; cursor:pointer; font-size:0.9rem;">
+                <input type="checkbox" ${isChecked} onchange="toggleProgress('${res.id}', this)"> Done
+            </label>
+            <button class="preview-btn" onclick="openMedia('${res.url}', '${res.title}')">Open</button>
         </div>
     </div>`;
 }
 
-// Media Modal Functions
-function openMedia(url, type, title) {
-    const modal = document.getElementById('media-modal');
-    const frame = document.getElementById('media-frame');
-    document.getElementById('media-title').innerText = title;
-    frame.src = url;
-    modal.style.display = 'block';
-}
-
-function closeMedia() {
-    const modal = document.getElementById('media-modal');
-    const frame = document.getElementById('media-frame');
-    modal.style.display = 'none';
-    frame.src = "";
-}
-
 // ==========================================
-// 5. REPORTING (Email)
+// 6. PROGRESS TRACKING (Live Cloud Sync)
 // ==========================================
-function generateReport() {
-    let name = currentUser ? currentUser.name : prompt("Enter your name:", "");
-    if (!name) return;
+window.toggleProgress = async (resourceId, checkbox) => {
+    if (!currentUser) return;
     
-    // Replace this with your email
-    const instructorEmail = "YOUR_EMAIL@msletb.ie"; 
-    
-    const date = new Date().toLocaleDateString();
-    let body = `Student: ${name}%0D%0A`; 
-    body += `Date: ${date}%0D%0A--------------------------------%0D%0A`;
-    
-    body += `MODULE PROGRESS:%0D%0A`;
-    courseData.modules.forEach(mod => {
-        let completed = 0;
-        let total = mod.units ? mod.units.length : 0;
-        if (total > 0) {
-            mod.units.forEach(u => { if(userProgress[mod.title + "_" + u.name]) completed++; });
-            const percent = Math.round((completed / total) * 100);
-            body += `[${percent}%] - ${mod.title}%0D%0A`;
-        }
-    });
-
-    body += `%0D%0AQUIZ SCORES:%0D%0A`;
-    let quizFound = false;
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key.startsWith('quiz_score_')) {
-            quizFound = true;
-            let quizName = key.split('/').pop().replace('.json', '').replace(/_/g, ' ');
-            let score = localStorage.getItem(key);
-            body += `- ${quizName}: ${score}%%0D%0A`;
-        }
+    if (checkbox.checked) {
+        userProgress[resourceId] = true;
+    } else {
+        delete userProgress[resourceId];
     }
-    if (!quizFound) body += "(No quizzes attempted)%0D%0A";
     
-    window.location.href = `mailto:${instructorEmail}?subject=Progress Report - ${name}&body=${body}`;
-}
-
-// ==========================================
-// 6. TOOLS & QUIZ ENGINE (Unchanged Logic)
-// ==========================================
-function toggleTheme() {
-    const current = document.documentElement.getAttribute('data-theme');
-    let target = current === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', target);
-    localStorage.setItem('msletb_theme', target);
-}
-function openTools() { document.getElementById('tools-modal').style.display = 'block'; }
-function closeTools() { document.getElementById('tools-modal').style.display = 'none'; }
-window.onclick = function(e) { if(e.target == document.getElementById('tools-modal')) closeTools(); }
-
-function switchTab(name) {
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-    document.getElementById('tab-' + name).classList.add('active');
-    event.target.classList.add('active');
-}
-function calcOhm() {
-    const v = parseFloat(document.getElementById('ohm-v').value);
-    const i = parseFloat(document.getElementById('ohm-i').value);
-    const r = parseFloat(document.getElementById('ohm-r').value);
-    const res = document.getElementById('ohm-result');
-    if (!isNaN(i) && !isNaN(r)) res.innerText = `Voltage = ${(i * r).toFixed(2)} V`;
-    else if (!isNaN(v) && !isNaN(r)) res.innerText = `Current = ${(v / r).toFixed(2)} A`;
-    else if (!isNaN(v) && !isNaN(i)) res.innerText = `Resistance = ${(v / i).toFixed(2)} Ω`;
-    else res.innerText = "Enter any 2 values.";
-}
-function calcScale() {
-    const min = parseFloat(document.getElementById('scale-min').value);
-    const max = parseFloat(document.getElementById('scale-max').value);
-    const pv = parseFloat(document.getElementById('scale-pv').value);
-    if (isNaN(min) || isNaN(max) || isNaN(pv)) { document.getElementById('scale-result').innerText = "Enter all values."; return; }
-    const result = (((pv - min) / (max - min)) * 16) + 4;
-    document.getElementById('scale-result').innerText = `Output: ${result.toFixed(2)} mA`;
-}
-
-// Quiz Engine
-let currentQuizData = null;
-let currentQuizUrl = "";
-function startQuiz(url) {
-    currentQuizUrl = url;
-    fetch(url).then(res => res.json()).then(data => {
-        const shuffled = data.questions.sort(() => 0.5 - Math.random());
-        currentQuizData = shuffled.slice(0, 10);
-        const modal = document.createElement('div');
-        modal.id = 'quiz-modal';
-        modal.className = 'modal';
-        modal.style.display = 'block';
-        modal.innerHTML = `
-            <div class="modal-content quiz-container" style="max-width:600px;">
-                <div class="quiz-header"><h2>${data.title}</h2><span class="close-modal" onclick="closeQuiz()">×</span></div>
-                <div id="quiz-body">${currentQuizData.map((q, i) => renderQuestion(q, i)).join('')}</div>
-                <div style="text-align:center; margin-top:20px;">
-                    <button class="calc-btn" style="background:var(--success);" onclick="submitQuiz()">Submit Answers</button>
-                </div>
-            </div>`;
-        document.body.appendChild(modal);
-    }).catch(err => alert("Error loading quiz."));
-}
-function renderQuestion(q, index) {
-    return `<div class="question-card" id="q-card-${index}"><p><strong>${index + 1}. ${q.question}</strong></p>
-        ${q.options.map((opt, i) => `<button class="option-btn" onclick="selectOpt(${index},${i},this)">${opt}</button>`).join('')}
-        <input type="hidden" id="ans-${index}" value=""></div>`;
-}
-function selectOpt(qIdx, oIdx, btn) {
-    const parent = btn.parentElement;
-    parent.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    document.getElementById(`ans-${qIdx}`).value = oIdx;
-}
-function submitQuiz() {
-    let score = 0;
-    currentQuizData.forEach((q, i) => {
-        const userAns = parseInt(document.getElementById(`ans-${i}`).value);
-        const card = document.getElementById(`q-card-${i}`);
-        const btns = card.querySelectorAll('.option-btn');
-        btns.forEach(b => b.classList.remove('correct', 'incorrect'));
-        if (!isNaN(userAns)) {
-            if (userAns === q.answer) { score++; btns[userAns].classList.add('correct'); }
-            else { btns[userAns].classList.add('incorrect'); btns[q.answer].classList.add('correct'); }
-        } else { btns[q.answer].classList.add('correct'); }
+    // Save to Firestore Cloud immediately
+    const userRef = doc(db, "users", currentUser.uid);
+    await updateDoc(userRef, {
+        progress: userProgress
     });
-    const percent = Math.round((score / currentQuizData.length) * 100);
-    alert(`Score: ${score}/${currentQuizData.length} (${percent}%)`);
-    const key = `quiz_score_${currentQuizUrl}`;
-    const old = localStorage.getItem(key) || 0;
-    if (percent > old) localStorage.setItem(key, percent);
-    closeQuiz();
-    loadContent();
 }
-function closeQuiz() { document.getElementById('quiz-modal').remove(); }
+
+// ==========================================
+// 7. ADMIN: UPLOAD & STUDENT TRACKING
+// ==========================================
+window.openUploadModal = () => document.getElementById('upload-modal').style.display = 'block';
+window.closeUploadModal = () => document.getElementById('upload-modal').style.display = 'none';
+
+window.uploadFile = async () => {
+    const file = document.getElementById('up-file').files[0];
+    const title = document.getElementById('up-title').value;
+    const moduleId = document.getElementById('up-module').value;
+    const type = document.getElementById('up-type').value;
+    const status = document.getElementById('up-status');
+
+    if (!file || !title) { alert("Please select a file and title"); return; }
+
+    status.innerText = "⏳ Uploading...";
+
+    try {
+        // 1. Upload File to Storage
+        const storageRef = ref(storage, `content/${file.name}`);
+        const snapshot = await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(snapshot.ref);
+
+        // 2. Save Metadata to Database
+        const docRef = doc(collection(db, "content"));
+        await setDoc(docRef, {
+            id: docRef.id,
+            title: title,
+            moduleId: moduleId,
+            type: type,
+            url: url,
+            timestamp: new Date()
+        });
+
+        status.innerText = "✅ Success!";
+        setTimeout(() => {
+            window.closeUploadModal();
+            loadContent(); // Refresh view
+            status.innerText = "";
+        }, 1000);
+
+    } catch (error) {
+        console.error(error);
+        status.innerText = "❌ Error: " + error.message;
+    }
+}
+
+async function loadAdminData() {
+    // Get all users
+    const querySnapshot = await getDocs(collection(db, "users"));
+    let html = `<table style="width:100%; border-collapse:collapse;">
+        <tr style="text-align:left; border-bottom:2px solid #ddd;">
+            <th>Email</th>
+            <th>Progress (Items Completed)</th>
+        </tr>`;
+    
+    querySnapshot.forEach((doc) => {
+        const u = doc.data();
+        if (u.role === 'student') {
+            const count = u.progress ? Object.keys(u.progress).length : 0;
+            html += `
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:8px;">${u.email}</td>
+                <td style="padding:8px;"><strong>${count}</strong> items</td>
+            </tr>`;
+        }
+    });
+    html += `</table>`;
+    document.getElementById('student-table').innerHTML = html;
+}
+
+// ==========================================
+// 8. MEDIA MODAL
+// ==========================================
+window.openMedia = (url, title) => {
+    document.getElementById('media-modal').style.display = 'block';
+    document.getElementById('media-frame').src = url;
+    document.getElementById('media-title').innerText = title;
+}
+window.closeMedia = () => {
+    document.getElementById('media-modal').style.display = 'none';
+    document.getElementById('media-frame').src = "";
+}

@@ -14,40 +14,38 @@
         <div class="login-box">
             <h2>MSLETB Course Hub</h2>
             <p>Phase 2: Electrical Instrumentation</p>
-            
             <input type="email" id="email-input" placeholder="Email Address">
             <input type="password" id="password-input" placeholder="Password">
-            
-            <button onclick="checkLogin()">Login</button>
+            <button onclick="login()">Login</button>
             <p id="error-msg">❌ Invalid Email or Password</p>
         </div>
     </div>
 
     <div id="main-app" style="display: none;">
-        
         <header>
             <div class="logo-area">
                 <h1>Phase 2 Instrumentation</h1>
-                <span id="user-display" style="font-size:0.8rem; opacity:0.8;"></span>
+                <span id="user-role-display" style="font-size:0.8rem; background:var(--accent); color:white; padding:2px 8px; border-radius:10px; display:none;">ADMIN</span>
             </div>
             <nav>
-                <button onclick="toggleTheme()" class="nav-btn" title="Toggle Dark Mode">🌙</button>
+                <button id="upload-btn" onclick="openUploadModal()" class="nav-btn" style="display:none; border-color:var(--primary); color:var(--primary);">➕ Add Content</button>
                 <button onclick="openTools()" class="nav-btn">🧮 Tools</button>
-                <button onclick="generateReport()" class="nav-btn" style="border-color:var(--success); color:var(--success);">📋 Report</button>
                 <button onclick="showHome()" class="nav-btn">Dashboard</button>
                 <button onclick="logout()" class="nav-btn logout">Logout</button>
             </nav>
         </header>
 
         <div class="container">
-            <div id="news-section">
-                <div class="section-header"><h2>📢 Announcements</h2></div>
-                <div id="news-feed"></div>
-            </div>
-
             <div id="dashboard-view">
+                <div id="admin-panel" style="display:none; margin-bottom:30px;">
+                    <h2 class="section-title">Class Progress (Live)</h2>
+                    <div id="student-table" style="background:white; padding:15px; border-radius:8px; border:1px solid #ddd;">
+                        <p>Loading student data...</p>
+                    </div>
+                </div>
+
                 <div class="search-container">
-                    <input type="text" id="search-input" placeholder="🔍 Search topics (e.g. 'Ohm', 'Safety')..." onkeyup="filterContent()">
+                    <input type="text" id="search-input" placeholder="🔍 Search topics..." onkeyup="filterContent()">
                 </div>
                 <h2 class="section-title">Course Modules</h2>
                 <div id="module-grid" class="grid-container"></div>
@@ -60,45 +58,36 @@
                 <div id="unit-content-area"></div>
             </div>
         </div>
-        
-        <footer><p>MSLETB Training Centre - Internal Use Only</p></footer>
     </div>
 
-    <div id="tools-modal" class="modal">
+    <div id="upload-modal" class="modal">
         <div class="modal-content">
-            <span class="close-modal" onclick="closeTools()">&times;</span>
-            <h2>⚡ Instrumentation Tools</h2>
-            <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('ohms')">Ohm's Law</button>
-                <button class="tab-btn" onclick="switchTab('scaling')">4-20mA Scaling</button>
-            </div>
-            <div id="tab-ohms" class="tab-content active">
-                <p>Calculate missing value:</p>
-                <div class="input-group">
-                    <input type="number" id="ohm-v" placeholder="Voltage (V)">
-                    <input type="number" id="ohm-i" placeholder="Current (A)">
-                    <input type="number" id="ohm-r" placeholder="Resistance (Ω)">
-                </div>
-                <button onclick="calcOhm()" class="calc-btn">Calculate</button>
-                <p id="ohm-result" class="result-text">Result: -</p>
-            </div>
-            <div id="tab-scaling" class="tab-content">
-                <p>Convert PV to mA:</p>
-                <div class="input-group">
-                    <input type="number" id="scale-min" placeholder="Min Range">
-                    <input type="number" id="scale-max" placeholder="Max Range">
-                    <input type="number" id="scale-pv" placeholder="Current Value">
-                </div>
-                <button onclick="calcScale()" class="calc-btn">Calculate mA</button>
-                <p id="scale-result" class="result-text">Output: - mA</p>
-            </div>
+            <span class="close-modal" onclick="closeUploadModal()">&times;</span>
+            <h2>Upload New Content</h2>
+            <input type="text" id="up-title" placeholder="Title (e.g. Ohm's Law Notes)" style="width:100%; padding:10px; margin-bottom:10px;">
+            
+            <select id="up-module" style="width:100%; padding:10px; margin-bottom:10px;">
+                <option value="01_Electricity">Module 1: Electricity</option>
+                <option value="02_Installation">Module 2: Installation</option>
+                <option value="03_Pressure">Module 3: Pressure</option>
+                </select>
+            
+            <select id="up-type" style="width:100%; padding:10px; margin-bottom:10px;">
+                <option value="pdf">PDF Document</option>
+                <option value="video">Video (MP4)</option>
+                <option value="audio">Audio (MP3)</option>
+            </select>
+
+            <input type="file" id="up-file" style="margin-bottom:20px;">
+            <button onclick="uploadFile()" class="calc-btn">Upload to Cloud</button>
+            <p id="up-status" style="text-align:center; margin-top:10px;"></p>
         </div>
     </div>
 
     <div id="media-modal" class="modal" style="z-index: 9999;">
         <div class="modal-content" style="width: 95%; height: 90%; max-width: 1200px; padding: 0; display: flex; flex-direction: column; background: #000;">
             <div style="background: var(--primary); color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;">
-                <h3 id="media-title" style="margin:0; font-size:1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Viewer</h3>
+                <h3 id="media-title" style="margin:0; font-size:1.1rem;">Viewer</h3>
                 <span class="close-modal" onclick="closeMedia()" style="color:white; font-size:2rem; line-height: 1;">&times;</span>
             </div>
             <div style="flex-grow: 1; position: relative; background: #333;">
@@ -107,6 +96,6 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
